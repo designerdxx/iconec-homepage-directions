@@ -1,0 +1,143 @@
+/* Iconec motion prototypes · shared base
+   Motion follows the 12 principles as adapted for web UI:
+   - anything the visitor triggers (hover, press, tabs, menus, accordions, counts) finishes within 300ms
+   - entrances ease out (arrive fast, settle), exits ease in (gather, then leave); no linear motion
+   - stagger steps are 50ms or less; one focal point per moment
+   - presses scale to .97–.98; overlays dim what sits behind them
+   - only transform and opacity animate on scroll, so everything stays on the compositor */
+@font-face{font-family:"Overused Grotesk";src:url("OverusedGrotesk-Roman.ttf") format("truetype");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Overused Grotesk";src:url("OverusedGrotesk-Medium.ttf") format("truetype");font-weight:500;font-style:normal;font-display:swap}
+
+:root{
+  --ink:#141A14; --sub:#5C615A; --green:#102C0B; --green-2:#1D4415;
+  --line:rgba(20,26,20,.12); --paper:#FFFFFF; --stone:#F3F1EC;
+  /* easing: expo-out for entrances, expo-in for exits, a gentle in-out only for ambient loops */
+  --ease:cubic-bezier(.16,1,.3,1); --ease-out:cubic-bezier(.16,1,.3,1); --ease-in:cubic-bezier(.7,0,.84,0); --ease-io:cubic-bezier(.45,0,.55,1);
+  /* timing: ui = visitor-triggered (≤300ms); reveal = scroll-triggered entrances */
+  --t-press:160ms; --t-ui:240ms; --t-ui-exit:200ms; --t-reveal:900ms; --t-img:1100ms;
+  --stagger:45ms;
+  --gutter:clamp(16px,4.4vw,64px);
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+/* opening a page from the gallery (and coming back) crossfades instead of cutting */
+@view-transition{navigation:auto}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.24s;animation-timing-function:cubic-bezier(.16,1,.3,1)}
+@media (prefers-reduced-motion:reduce){::view-transition-old(root),::view-transition-new(root){animation:none}}
+html:not(.lenis){scroll-behavior:smooth}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+.lenis.lenis-stopped{overflow:hidden}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Overused Grotesk","Noto Kufi Arabic",ui-sans-serif,system-ui,sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden}
+::selection{background:var(--green);color:#fff}
+h1,h2,h3,p,ul,ol,dl,dd,figure,blockquote{margin:0;padding:0}
+li{list-style:none}
+h1,h2,h3{font-weight:400;text-wrap:balance}
+img,video{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:inherit}
+:focus-visible{outline:2px solid var(--green);outline-offset:3px}
+.num{font-variant-numeric:tabular-nums}
+.wrap{padding-left:max(var(--gutter),env(safe-area-inset-left,0px));padding-right:max(var(--gutter),env(safe-area-inset-right,0px))}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* buttons and links: hover ≤240ms ease-out, press scales to .97 */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 26px;border-radius:999px;background:var(--green);color:#fff;font-weight:500;font-size:15px;white-space:nowrap;transition:background-color var(--t-ui) var(--ease-out),transform var(--t-press) var(--ease-out)}
+.btn:hover{background:var(--green-2)}
+.btn-o{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 26px;border-radius:999px;color:var(--ink);font-weight:500;font-size:15px;white-space:nowrap;box-shadow:inset 0 0 0 1px rgba(20,26,20,.28);transition:box-shadow var(--t-ui) var(--ease-out),transform var(--t-press) var(--ease-out)}
+.btn-o:hover{box-shadow:inset 0 0 0 1px var(--ink)}
+.btn:active,.btn-o:active,.lang:active,[role="tab"]:active,[role="radio"]:active,[data-menu-open]:active,[data-menu-close]:active,.rv a:active,.rv button:active,.press:active{transform:scale(.97)}
+.lang,[role="tab"],[role="radio"],[data-menu-open],[data-menu-close],.press{transition:transform var(--t-press) var(--ease-out),color var(--t-ui) var(--ease-out),background-color var(--t-ui) var(--ease-out),box-shadow var(--t-ui) var(--ease-out),opacity var(--t-ui) var(--ease-out)}
+.u{background-image:linear-gradient(currentColor,currentColor);background-size:100% 1px;background-position:0 100%;background-repeat:no-repeat;padding-bottom:2px;transition:background-size var(--t-ui) var(--ease-out)}
+.u:hover{background-size:0% 1px;background-position:100% 100%;transition-timing-function:var(--ease-in);transition-duration:var(--t-ui-exit)}
+.lang{height:44px;min-width:36px;padding:0 6px;font-size:13px;opacity:.6}
+.lang[aria-pressed="true"]{opacity:1}
+@media (max-width:760px){.btn,.btn-o{min-height:52px}}
+
+/* header: settles on scroll (ease-out), tucks away on fast scroll down (ease-in exit) */
+[data-header]{position:sticky;top:0;z-index:40;transition:background-color .36s var(--ease-out),color .36s var(--ease-out),box-shadow .36s var(--ease-out),transform .36s var(--ease-out)}
+[data-header="overlay"]{position:fixed;left:0;right:0;color:#fff}
+[data-header].scrolled{background:rgba(255,255,255,.98);color:var(--ink);box-shadow:0 1px 0 var(--line)}
+[data-header].hidden{transform:translate3d(0,-100%,0);transition-timing-function:var(--ease-in);transition-duration:.26s}
+[data-header] .logo svg{transition:fill .36s var(--ease-out)}
+
+/* scroll reveals (JS adds html.js before first paint; without JS everything is visible) */
+html.js [data-reveal]{opacity:0;transform:translate3d(0,24px,0);transition:opacity var(--t-reveal) var(--ease-out),transform calc(var(--t-reveal) + .1s) var(--ease-out);transition-delay:var(--d,0ms)}
+html.js [data-reveal="fade"]{transform:none}
+html.js [data-reveal="left"]{transform:translate3d(-24px,0,0)}
+html.js [data-reveal].in{opacity:1;transform:none}
+html.js [data-reveal]:not(.done){will-change:opacity,transform}
+/* image unmask, transform only: the engine wraps the image in .rv-mask; the mask slides up from below
+   while the image counter-slides and settles from a slight zoom */
+.rv-mask{display:block;width:100%;height:100%;overflow:hidden;position:relative}
+.rv-mask>img{width:100%;height:100%}
+html.js [data-reveal="img"]{opacity:1;transform:none;overflow:hidden}
+html.js [data-reveal="img"] .rv-mask{transform:translate3d(0,101%,0);transition:transform var(--t-img) var(--ease-out);transition-delay:var(--d,0ms)}
+html.js [data-reveal="img"] .rv-mask>img{transform:translate3d(0,-101%,0) scale(1.08);transition:transform calc(var(--t-img) + .2s) var(--ease-out);transition-delay:var(--d,0ms)}
+html.js [data-reveal="img"]:not(.done) .rv-mask,html.js [data-reveal="img"]:not(.done) .rv-mask>img{will-change:transform}
+html.js [data-reveal="img"].in .rv-mask,html.js [data-reveal="img"].in .rv-mask>img{transform:none}
+/* a rule that draws itself */
+html.js [data-reveal="rule"]{opacity:1;transform:scaleX(0);transform-origin:0 50%;transition:transform .9s var(--ease-out);transition-delay:var(--d,0ms)}
+html.js [data-reveal="rule"].in{transform:scaleX(1)}
+
+/* hero load sequence: lines rise 50ms apart, supporting copy follows as a second beat */
+.h-line{display:block;overflow:hidden;padding-bottom:.08em;margin-bottom:-.08em}
+.h-line>span{display:block}
+html.js [data-hero] .h-line>span{transform:translate3d(0,105%,0);transition:transform 1s var(--ease-out);transition-delay:calc(var(--i,0) * 50ms + 150ms);will-change:transform}
+html.js [data-hero].loaded .h-line>span{transform:none}
+html.js [data-hero] [data-hero-fade]{opacity:0;transform:translate3d(0,14px,0);transition:opacity .8s var(--ease-out),transform .9s var(--ease-out);transition-delay:var(--d,450ms)}
+html.js [data-hero].loaded [data-hero-fade]{opacity:1;transform:none}
+html.js [data-hero] .kb{transform:scale(1.1);transition:transform 2.2s var(--ease-out);will-change:transform}
+html.js [data-hero].loaded .kb{transform:scale(1)}
+.kb-drift{animation:kbDrift 28s var(--ease-io) 2.2s infinite alternate;will-change:transform}
+@keyframes kbDrift{from{transform:scale(1)}to{transform:scale(1.06)}}
+[data-paused="true"] .kb-drift{animation-play-state:paused}
+
+/* parallax target (engine writes translate3d; keep it on the compositor) */
+[data-parallax]{will-change:transform;backface-visibility:hidden}
+
+/* hover on product imagery: visitor-triggered, so ≤300ms */
+.zoom{overflow:hidden}
+.zoom img{transition:transform .28s var(--ease-out)}
+.zoom:hover img{transform:scale(1.03)}
+
+/* tab panels: the new panel arrives in 240ms (the old one leaves instantly, so nothing overlaps) */
+[data-panel]{transition:opacity var(--t-ui) var(--ease-out),transform var(--t-ui) var(--ease-out)}
+[data-panel][hidden]{display:none!important}
+[data-panel].enter{opacity:0;transform:translate3d(0,6px,0)}
+
+/* accordion: opens 280ms ease-out, closes 200ms ease-in (engine drives the height) */
+details.acc>summary{list-style:none;cursor:pointer}
+details.acc>summary::-webkit-details-marker{display:none}
+details.acc .acc-body{overflow:hidden}
+details.acc .plus-v{transition:transform var(--t-ui) var(--ease-out),opacity var(--t-ui-exit) var(--ease-out)}
+details.acc[open] .plus-v{transform:rotate(90deg);opacity:0}
+
+/* menu sheet: slides in 300ms ease-out, leaves 220ms ease-in, with a dimmed backdrop */
+[data-menu]{position:fixed;inset:0;z-index:60;background:var(--paper);color:var(--ink);transform:translate3d(100%,0,0);transition:transform .22s var(--ease-in),visibility 0s linear .22s;visibility:hidden;display:flex;flex-direction:column;padding:16px max(var(--gutter),env(safe-area-inset-right,0px)) 32px max(var(--gutter),env(safe-area-inset-left,0px))}
+[data-menu].open{transform:none;visibility:visible;transition:transform .3s var(--ease-out),visibility 0s}
+[data-menu] .m-links a{display:block;font-size:28px;letter-spacing:-.02em;padding:12px 0;border-bottom:1px solid var(--line);opacity:0;transform:translate3d(16px,0,0);transition:opacity .26s var(--ease-out),transform .3s var(--ease-out);transition-delay:calc(var(--i,0) * 40ms + 80ms)}
+[data-menu].open .m-links a{opacity:1;transform:none}
+.menu-scrim{position:fixed;inset:0;z-index:55;background:rgba(10,14,10,.45);opacity:0;visibility:hidden;transition:opacity .22s var(--ease-in),visibility 0s linear .22s}
+body.menu-open .menu-scrim{opacity:1;visibility:visible;transition:opacity .3s var(--ease-out),visibility 0s}
+body.menu-open{overflow:hidden}
+
+/* review controls (not part of the design) */
+.rv{position:fixed;left:max(12px,env(safe-area-inset-left,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));z-index:80;display:flex;align-items:center;gap:2px;padding:4px;border-radius:999px;background:rgba(20,26,20,.92);color:#fff;font:500 12px/1 "Overused Grotesk",system-ui,sans-serif;box-shadow:0 10px 30px -10px rgba(0,0,0,.4)}
+.rv a{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:999px;color:#fff;transition:background-color var(--t-ui) var(--ease-out),transform var(--t-press) var(--ease-out)}
+.rv a:hover{background:rgba(255,255,255,.12)}
+.rv-n{padding:0 8px 0 6px;white-space:nowrap;color:rgba(255,255,255,.9)}
+@media (max-width:520px){.rv{left:50%;transform:translateX(-50%);bottom:max(10px,env(safe-area-inset-bottom,0px))}.rv a{width:40px;height:40px}}
+html.still .rv{display:none}
+
+/* motion notes overlay */
+.mn{position:absolute;z-index:30;left:12px;top:12px;max-width:min(300px,80vw);display:none;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:10px;background:#F2D04B;color:#141A14;font:500 12px/1.35 "Overused Grotesk",system-ui,sans-serif;box-shadow:0 8px 20px -8px rgba(0,0,0,.35);pointer-events:none}
+.mn b{display:inline-flex;align-items:center;justify-content:center;flex:none;width:18px;height:18px;border-radius:50%;background:#141A14;color:#F2D04B;font-size:11px}
+html.notes .mn{display:flex}
+html.notes [data-note]{outline:1px dashed rgba(242,208,75,.9);outline-offset:-1px}
+
+/* reduced motion (system setting) and still screenshots: everything visible, nothing moves */
+html.rm *,html.rm *::before,html.rm *::after{transition:none!important;animation:none!important}
+html.rm [data-reveal],html.rm [data-reveal] img,html.rm .rv-mask,html.rm [data-hero] .h-line>span,html.rm [data-hero] [data-hero-fade],html.rm [data-hero] .kb{opacity:1!important;transform:none!important;clip-path:none!important}
+html.rm [data-parallax]{transform:none!important}

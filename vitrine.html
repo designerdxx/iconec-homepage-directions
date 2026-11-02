@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>(function(d){var h=d.documentElement;h.classList.add("js");var s=/[?&]still\b/.test(location.search);if(s)h.classList.add("still");if(s||(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches))h.classList.add("rm");})(document)</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Vitrine · Iconec motion prototype</title>
+<meta name="iconec-index" content="index.html">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500&display=swap">
+<link rel="stylesheet" href="base.css">
+<style>
+/* The Vitrine: pure white, standard homepage order, full-bleed hero */
+:root{
+  --gutter:clamp(20px,4.4vw,64px);
+  --hair:rgba(20,26,20,.12);
+  --slate:#1C1D1E;
+  --sec:160px;
+}
+body{background:#FFFFFF;color:var(--ink)}
+.d-only{}
+.m-only{display:none}
+.h2{font-size:32px;line-height:1.1;letter-spacing:-.02em}
+.lede{color:var(--sub)}
+.lnk{font-size:13px;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px;text-decoration-color:rgba(20,26,20,.3);transition:text-decoration-color var(--t-ui) var(--ease-out)}
+.lnk:hover{text-decoration-color:var(--ink)}
+.rule{display:block;height:1px;background:var(--ink)}
+.rule.soft{background:rgba(20,26,20,.2)}
+.rule.hair{background:var(--hair)}
+.sec{padding-top:var(--sec)}
+
+/* header over the hero */
+.hd{height:76px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.hd-l{display:flex;align-items:center;gap:56px}
+.hd-r{display:flex;align-items:center;gap:20px}
+.logo{display:flex;align-items:center;min-height:44px}
+.logo svg{height:20px;width:auto;display:block}
+.nav{display:flex;gap:32px;font-size:13px}
+.hd .lang{height:32px;min-width:34px;padding:0 9px;border-radius:999px;opacity:1;color:rgba(255,255,255,.78);transition:transform var(--t-press) var(--ease-out),color .36s var(--ease-out),box-shadow .36s var(--ease-out)}
+.hd .lang[aria-pressed="true"]{color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.5)}
+.hd.scrolled .lang{color:var(--sub)}
+.hd.scrolled .lang[aria-pressed="true"]{color:var(--ink);box-shadow:inset 0 0 0 1px rgba(20,26,20,.22)}
+.hd-signin{font-size:13px}
+.hd .btn{min-height:40px;height:40px;padding:0 20px;font-size:13px}
+.btn-w{background:#fff;color:var(--green);transition:background-color var(--t-ui) var(--ease-out),color var(--t-ui) var(--ease-out),transform var(--t-press) var(--ease-out)}
+.btn-w:hover{background:#F2F2F0}
+.hd.scrolled .btn-w{background:var(--green);color:#fff}
+.hd.scrolled .btn-w:hover{background:var(--green-2)}
+/* a button that scroll-reveals itself carries the 0.9s reveal transition; once revealed, hand press/hover back to the UI timings */
+html.js .btn[data-reveal].done{transition:background-color var(--t-ui) var(--ease-out),transform var(--t-press) var(--ease-out)}
+.btn-ow{color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.55)}
+.btn-ow:hover{box-shadow:inset 0 0 0 1px #fff}
+.menu-b{display:none;width:44px;height:44px;align-items:center;justify-content:center}
+.hd-langs{display:flex;gap:2px}
+
+/* menu sheet (motion comes from the engine: 300ms in, 220ms out, dimmed backdrop) */
+.sheet-top{height:60px;margin:-16px 0 8px;display:flex;align-items:center;justify-content:space-between;margin-right:-12px}
+.sheet-top .logo svg{height:17px}
+.close-b{width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+.sheet .btn{margin-top:auto;width:100%}
+
+/* hero */
+.hero{position:relative;height:880px;overflow:hidden;background:var(--slate);color:#fff;display:flex;flex-direction:column;justify-content:flex-end}
+.hero-media{position:absolute;inset:0;overflow:hidden}
+.hero-media img{width:100%;height:100%;object-fit:cover;object-position:50% 58%;transform-origin:50% 58%}
+.hero-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,10,8,.5) 0%,rgba(8,10,8,0) 18%,rgba(8,10,8,0) 48%,rgba(8,10,8,.62) 100%)}
+.hero-in{position:relative;z-index:2;padding-bottom:64px;display:flex;flex-direction:column;gap:24px}
+.hero-copy{display:flex;flex-direction:column;gap:24px;max-width:560px}
+.hero h1{font-size:56px;line-height:1.02;letter-spacing:-.028em}
+.hero-lede{font-size:20px;line-height:1.45;color:rgba(255,255,255,.88);max-width:24em}
+.hero-ctas{display:flex;gap:12px;padding-top:4px}
+.hero-foot{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:-4px}
+.hero-offer{font-size:13px;color:rgba(255,255,255,.84)}
+.pause{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:999px;font-size:13px;color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.4)}
+.pause:hover{box-shadow:inset 0 0 0 1px #fff}
+.pause .i-play{display:none}
+.hero[data-paused="true"] .pause .i-play{display:block}
+.hero[data-paused="true"] .pause .i-pause{display:none}
+
+/* new this month */
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:40px}
+.sec-head .tx{display:flex;flex-direction:column;gap:10px}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.card{display:flex;flex-direction:column;gap:14px}
+.ph{display:block;overflow:hidden;background:var(--slate)}
+.card .ph{aspect-ratio:4/5}
+.ph img{width:100%;height:100%;object-fit:cover}
+/* hover zoom uses the separate `scale` property, so it never fights the engine's reveal transform on .rv-mask>img */
+.card .ph img{scale:1;transition:scale var(--t-ui) var(--ease-out)}
+html.js .card .rv-mask>img{transition:transform calc(var(--t-img) + .2s) var(--ease-out) var(--d,0ms),scale var(--t-ui) var(--ease-out) 0ms}
+.card:hover .ph img{scale:1.03}
+.card .meta{display:flex;flex-direction:column}
+.card .meta b{font-weight:500}
+.card .meta span{font-size:13px;color:var(--sub)}
+.ring-crop{object-position:50% 20%}
+
+/* how it works */
+.sec-head.stack{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:48px}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:24px}
+.step{display:flex;flex-direction:column}
+.step-tx{padding-top:20px;display:flex;flex-direction:column;gap:8px}
+.step h3{font-size:20px;letter-spacing:-.01em;line-height:1.3}
+.step h3 .n{color:var(--sub)}
+.step p{color:var(--sub)}
+.steps-top{display:none}
+
+/* membership */
+.mem{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;row-gap:28px;align-items:start;align-content:start}
+.mem>.m-head,.mem>.m-seg,.mem>.m-price,.mem>.m-cta,.mem>.m-note{grid-column:1/span 5}
+.mem>.tray{grid-column:7/span 6;grid-row:1/span 5}
+.m-head{display:flex;flex-direction:column;gap:10px}
+.m-seg{display:flex;gap:8px}
+.seg{flex:1;display:flex;flex-direction:column;gap:2px;padding:14px 18px;border-radius:12px;box-shadow:inset 0 0 0 1px rgba(20,26,20,.14);color:var(--ink);transition:box-shadow var(--t-ui) var(--ease-out),transform var(--t-press) var(--ease-out)}
+.seg b{font-weight:500}
+.seg span{color:var(--sub);font-size:13px}
+.seg:hover{box-shadow:inset 0 0 0 1px rgba(20,26,20,.4)}
+.seg[aria-checked="true"]{box-shadow:inset 0 0 0 1.5px var(--ink)}
+.m-price{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding-top:24px;position:relative}
+.m-price .rule{position:absolute;left:0;right:0;top:0;background:var(--hair)}
+.m-price .big{font-size:32px;letter-spacing:-.02em;line-height:1.2}
+.m-price .small{font-size:13px;color:var(--sub)}
+.m-cta{justify-self:start}
+.m-note{display:none;font-size:13px;color:var(--sub);text-align:center;margin-top:-6px}
+.tray{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:16px}
+.slot{display:grid}
+.slot>*{grid-area:1/1}
+.slot .fig{display:flex;flex-direction:column;gap:10px}
+.slot .frame{display:block;height:320px;overflow:hidden}
+.slot .fill{display:block;height:100%;background:var(--slate)}
+.slot .frame img{width:100%;height:100%;object-fit:cover}
+.slot figcaption{font-size:13px;line-height:1.55}
+.add{display:flex;flex-direction:column;gap:10px;width:100%}
+.add-f{height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;box-shadow:inset 0 0 0 1px rgba(20,26,20,.14);color:var(--sub);font-size:13px;transition:box-shadow var(--t-ui) var(--ease-out),color var(--t-ui) var(--ease-out)}
+.add:hover .add-f{box-shadow:inset 0 0 0 1px rgba(20,26,20,.4);color:var(--ink)}
+.add-c{font-size:13px;color:var(--sub);line-height:1.55}
+/* tray motion, transform + opacity only, all within 300ms.
+   Fill (entrance, ease-out 240ms): .fill slides up inside the frame while the photo counter-slides and settles
+   from 1.04, so the frame wipes open over a still photo; the caption follows 50ms later; the empty box fades out (ease-in 200ms).
+   Empty (exit, ease-in 200ms): the piece fades, then snaps back below the frame unseen; the empty box fades in.
+   The photo uses the individual translate/scale properties so it never fights the engine's reveal transform. */
+.slot .fill{transition:transform var(--t-ui) var(--ease-out)}
+.slot .frame img{transition:translate var(--t-ui) var(--ease-out),scale var(--t-ui) var(--ease-out)}
+html.js .tray .rv-mask>img{transition:transform calc(var(--t-img) + .2s) var(--ease-out) var(--d,0ms),translate var(--t-ui) var(--ease-out) 0ms,scale var(--t-ui) var(--ease-out) 0ms}
+.slot figcaption{transition:opacity var(--t-ui) var(--ease-out) 50ms,transform var(--t-ui) var(--ease-out) 50ms}
+.slot .fig{transition:opacity var(--t-press) var(--ease-out),visibility 0s}
+.slot .add{opacity:0;visibility:hidden;transition:opacity var(--t-ui-exit) var(--ease-in),transform var(--t-press) var(--ease-out),visibility 0s linear var(--t-ui-exit)}
+.slot.empty .fig{opacity:0;visibility:hidden;pointer-events:none;transition:opacity var(--t-ui-exit) var(--ease-in),visibility 0s linear var(--t-ui-exit)}
+.slot.empty .fill{transform:translate3d(0,101%,0);transition:transform 0s var(--t-ui-exit)}
+.slot.empty .frame img,html.js .tray .slot.empty .rv-mask>img{translate:0 -101%;scale:1.04}
+html.js .tray .slot.empty .rv-mask>img{transition:transform calc(var(--t-img) + .2s) var(--ease-out) var(--d,0ms),translate 0s var(--t-ui-exit),scale 0s var(--t-ui-exit)}
+.slot.empty figcaption{opacity:0;transform:translate3d(0,8px,0);transition:opacity 0s var(--t-ui-exit),transform 0s var(--t-ui-exit)}
+.slot.empty .add{opacity:1;visibility:visible;transition:opacity var(--t-ui) var(--ease-out),transform var(--t-press) var(--ease-out),visibility 0s}
+
+/* real, certified */
+.trust{padding:0 var(--gutter);display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;align-items:center}
+.trust>.ph{grid-column:1/span 6;height:600px}
+.plx{display:block;height:100%}
+.trust-tx{grid-column:8/span 5;display:flex;flex-direction:column;gap:28px}
+.trust-tx .lede{max-width:26em}
+.specs{position:relative}
+.specs .row{display:grid;grid-template-columns:160px minmax(0,1fr);padding:14px 0;border-bottom:1px solid var(--hair)}
+.specs dt{color:var(--sub)}
+
+/* gift */
+.gift{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;align-items:center}
+.gift-tx{grid-column:1/span 5;display:flex;flex-direction:column;gap:16px}
+.gift-tx .lede{max-width:24em}
+.gift-tx .btn-o{align-self:flex-start;margin-top:8px}
+.gift>.ph{grid-column:7/span 6;height:420px}
+
+/* faq */
+.faq{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px}
+.faq-h{grid-column:1/span 4;display:flex;flex-direction:column;gap:10px}
+.faq-l{grid-column:6/span 7}
+.acc{border-bottom:1px solid var(--hair)}
+.acc summary{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0}
+.acc summary svg{flex:none}
+.acc summary.press:active{transform:scale(.98)}
+.acc-body p{padding:0 0 22px;color:var(--sub);max-width:36em}
+
+/* join */
+.join{margin-top:var(--sec);padding:72px 0;position:relative;display:flex;justify-content:space-between;align-items:center;gap:24px}
+.join>.rule{position:absolute;left:0;right:0;top:0}
+.join-tx{display:flex;flex-direction:column;gap:10px}
+
+/* footer */
+.ft{padding-top:56px;padding-bottom:36px;display:flex;flex-direction:column;gap:56px;position:relative}
+.ft>.rule{position:absolute;left:0;right:0;top:0}
+.ft-cols{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;font-size:13px}
+.ft-col{grid-column:span 2;display:flex;flex-direction:column;gap:10px}
+.ft-col p{font-weight:500}
+.ft-col a{transition:color var(--t-ui) var(--ease-out)}
+.ft-col a:hover{color:var(--sub)}
+.ft-base{display:flex;justify-content:space-between;gap:16px;font-size:13px;color:var(--sub)}
+.ft-base div{display:flex;gap:24px}
+.ft-in{margin:0 var(--gutter)}
+.ft-pad{padding-bottom:72px}
+
+/* tablet */
+@media (max-width:1024px){
+  :root{--sec:120px}
+  .hero{height:760px}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:40px}
+  .mem{display:flex;flex-direction:column;gap:28px}
+  .mem>.m-head{order:1}.mem>.tray{order:2;width:100%}.mem>.m-seg{order:3;width:100%;max-width:560px}.mem>.m-price{order:4;width:100%;max-width:560px}.mem>.m-cta{order:5;align-self:flex-start}
+  .trust>.ph{height:520px}
+  .ft-col{grid-column:span 3}
+}
+@media (max-width:900px){
+  .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .nav,.hd-signin,.hd-join{display:none}
+  .menu-b{display:inline-flex}
+  .hd{height:60px;padding-right:max(8px,env(safe-area-inset-right,0px))}
+  .hd-r{gap:0}
+  .hd .lang{height:44px;min-width:44px;padding:0 6px;box-shadow:none!important}
+  .logo svg{height:17px}
+}
+@media (min-width:901px){[data-menu]{display:none}}
+
+/* phone */
+@media (max-width:760px){
+  :root{--sec:72px}
+  body{font-size:15px}
+  .d-only{display:none}
+  .m-only{display:inline}
+  .h2{font-size:28px}
+  .hero{height:760px}
+  .hero-media img{object-position:50% 40%;transform-origin:50% 40%}
+  .hero-scrim{background:linear-gradient(180deg,rgba(8,10,8,.5) 0%,rgba(8,10,8,0) 16%,rgba(8,10,8,0) 40%,rgba(8,10,8,.7) 100%)}
+  .hero-in{padding-bottom:28px;gap:14px}
+  .hero-copy{gap:14px}
+  .hero h1{font-size:40px;letter-spacing:-.026em}
+  .hero-lede{font-size:15px;line-height:1.55}
+  .hero-ctas{flex-direction:column;padding-top:6px}
+  .hero-ctas .btn{width:100%}
+  .hero-ctas .btn-o{display:none}
+  .hero-foot{margin-top:0}
+  .pause{height:44px}
+
+  #pieces .sec-head{margin-bottom:20px;align-items:baseline;flex-wrap:wrap;row-gap:2px}
+  #pieces .sec-head .tx{display:contents}
+  #pieces .sec-head .h2{order:1}
+  #pieces .sec-head .lnk{order:2;display:inline-flex;align-items:center;min-height:44px}
+  #pieces .sec-head .lede{order:3;flex-basis:100%;margin-top:-6px}
+  .rail-wrap{padding-left:0;padding-right:0}
+  .cards{display:flex;gap:12px;overflow-x:auto;padding:0 var(--gutter);scroll-padding-inline:var(--gutter);scroll-snap-type:x mandatory;scrollbar-width:none}
+  .cards::-webkit-scrollbar{display:none}
+  .cards>li{flex:0 0 240px;scroll-snap-align:start}
+  .card{gap:10px}
+  .card .ph{aspect-ratio:auto;height:300px}
+
+  .sec-head.stack{gap:4px;margin-bottom:20px}
+  .steps{display:flex;flex-direction:column;position:relative;gap:0}
+  .steps-top{display:block;position:absolute;left:0;right:0;top:0}
+  .step{flex-direction:column-reverse}
+  .step .rule{background:var(--hair)}
+  .step-tx{padding:16px 0;gap:2px}
+
+  .mem{gap:20px}
+  .m-head{gap:4px}
+  .tray{column-gap:10px}
+  .slot .fig,.add{gap:8px}
+  .slot .frame,.add-f{height:180px}
+  .add-f .add-t{display:none}
+  .slot figcaption,.add-c{line-height:1.3}
+  .mem>.m-seg{gap:6px;max-width:none}
+  .seg{justify-content:center;min-height:60px;padding:10px 12px}
+  .mem>.m-price{display:none}
+  .mem>.m-cta{order:5;align-self:stretch;width:100%}
+  .mem>.m-note{display:block;order:6;align-self:stretch}
+
+  .trust{padding:0;display:flex;flex-direction:column;align-items:stretch}
+  .trust>.ph{height:360px;width:100%}
+  .trust-tx{padding:24px var(--gutter) 0;gap:16px}
+  .trust-tx .tx{gap:4px!important}
+  .specs .row{grid-template-columns:136px minmax(0,1fr);padding:12px 0}
+
+  .gift{display:flex;flex-direction:column;align-items:stretch;gap:12px}
+  .gift>.ph{order:-1;height:240px;margin-bottom:8px}
+  .gift-tx{gap:12px}
+  .gift-tx .btn-o{align-self:stretch}
+
+  .faq{display:block}
+  .faq-h{margin-bottom:16px}
+  .faq-h .lede{display:none}
+  .acc summary{padding:0;min-height:56px}
+  .acc-body p{padding:0 0 18px}
+
+  .join{flex-direction:column;align-items:stretch;padding:28px 0 40px;gap:12px}
+  .join-tx{gap:12px}
+  .join .btn{margin-top:8px}
+
+  .ft{padding-top:32px;padding-bottom:28px;gap:24px}
+  .ft-cols{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:20px;column-gap:16px;font-size:15px}
+  .ft-col{grid-column:auto;gap:0}
+  .ft-col a{display:flex;align-items:center;min-height:44px}
+  .ft-base div{gap:0}
+  .ft-base .ft-cur{display:none}
+  .ft-pad{padding-bottom:84px}
+}
+</style>
+</head>
+<body>
+
+<header class="hd wrap" data-header="overlay">
+  <div class="hd-l">
+    <a class="logo" href="#top" aria-label="Iconec home"><svg viewBox="0 0 220 84.29" fill="currentColor" role="img" aria-label="Iconec"><path d="M2.039 82.958V10.407H0V9.074H10.749V10.407H8.71V82.958H10.749V84.291H0V82.958H2.039Z"></path><path d="M18.686 65.011V28.352C18.686 22.874 20.757 17.638 24.366 13.983C27.438 10.871 31.403 9.127 35.529 9.074H35.581C39.691 9.139 43.643 10.881 46.702 13.983C50.267 17.591 52.336 22.764 52.381 28.172V35.035H45.712V21.975C45.673 18.709 44.41 15.579 42.251 13.393C40.402 11.52 38.019 10.46 35.538 10.407C33.053 10.457 30.667 11.518 28.818 13.391C26.658 15.577 25.398 18.709 25.357 21.984V71.386C25.396 74.652 26.658 77.782 28.816 79.968C30.666 81.841 33.051 82.902 35.534 82.954C39.367 82.901 43.051 81.279 45.906 78.387C49.268 74.985 51.194 70.11 51.194 65.009V64.516H52.381V65.009C52.381 70.485 50.31 75.723 46.701 79.376C43.629 82.488 39.666 84.232 35.539 84.287H35.531L35.536 83.794L35.528 84.287C31.402 84.232 27.438 82.488 24.366 79.376C20.757 75.723 18.686 70.485 18.686 65.009V65.011Z"></path><path d="M107.554 9.074L133.984 80.292V14.861C133.889 13.653 133.399 12.533 132.601 11.706C131.793 10.868 130.743 10.407 129.642 10.407H129.202V9.074H137.208V10.407H135.17V84.291H128.696L102.266 13.073V78.501C102.361 79.71 102.851 80.83 103.649 81.657C104.457 82.495 105.507 82.956 106.608 82.956H107.048V84.289H99.042V82.956H101.08V10.407H99.042V9.074H107.554Z"></path><path d="M145.724 82.956V10.405H143.685V9.072H179.816V21.976H178.629V21.483C178.629 15.609 174.547 10.745 169.334 10.403H152.397V46.012H163.017C166.237 45.797 168.759 42.791 168.759 39.161V38.668H169.946V54.687H168.759V54.194C168.759 50.565 166.237 47.557 163.017 47.343H152.397V82.951H169.334C174.548 82.609 178.629 77.745 178.629 71.872V71.379H179.816V84.282H143.685V82.949H145.724V82.956Z"></path><path d="M186.303 65.011V28.352C186.303 22.874 188.374 17.638 191.984 13.983C195.055 10.871 199.02 9.127 203.147 9.074H203.199C207.308 9.139 211.26 10.881 214.32 13.983C217.884 17.591 219.953 22.764 219.998 28.172V35.035H213.329V21.975C213.29 18.709 212.028 15.579 209.868 13.393C208.021 11.52 205.636 10.46 203.155 10.407C200.67 10.457 198.284 11.518 196.433 13.391C194.274 15.577 193.013 18.709 192.973 21.984V71.386C193.011 74.652 194.274 77.782 196.433 79.968C198.283 81.841 200.669 82.902 203.152 82.954C206.984 82.901 210.668 81.279 213.523 78.387C216.885 74.985 218.811 70.11 218.811 65.009V64.516H219.998V65.009C219.998 70.485 217.928 75.723 214.318 79.376C211.246 82.488 207.283 84.232 203.157 84.287H203.148L203.152 83.794L203.143 84.287C199.017 84.232 195.054 82.488 191.982 79.376C188.372 75.723 186.302 70.485 186.302 65.009L186.303 65.011Z"></path><g transform="translate(58.82 0) scale(0.52775)"><path d="M36.942 17.629C40.341 13.429 47.362 5.086 47.362 5.086V1.976H45.192V4.162C45.192 4.162 34.594 17.251 34.591 17.254V19.989C38.343 20.638 41.949 22.506 44.805 25.397C48.897 29.54 51.286 35.471 51.362 41.66V135.269C51.289 141.474 48.897 147.408 44.805 151.551C41.297 155.103 36.773 157.114 32.065 157.209H31.938C27.23 157.114 22.706 155.103 19.198 151.551C15.107 147.408 12.717 141.477 12.641 135.288V41.675C12.714 35.471 15.107 29.536 19.198 25.393C22.188 22.366 26.067 20.46 30.016 19.904V17.264L19.373 4.159V1.973H17.203V5.083C17.203 5.083 24.294 13.416 27.69 17.585C21.692 18.503 16.295 21.264 11.618 25.676C11.329 25.95 11.046 26.226 10.764 26.512C3.924 33.438 0 43.362 0 53.742V123.203C0 133.582 3.924 143.504 10.764 150.429C16.584 156.326 24.094 159.63 31.919 159.735H32.011H32.09C39.906 159.63 47.416 156.326 53.236 150.429C60.076 143.507 64 133.582 64 123.206V53.742C64 43.362 60.076 33.441 53.236 26.515C48.541 21.759 43.111 18.693 36.945 17.629"></path><path d="M40.656 0.016H23.869L21.486 4.159L32.297 17.222L43.051 4.159L40.656 0.016ZM31.185 12.486L23.973 3.854L25.101 2.002H31.185V12.486ZM33.364 12.486V2.002H39.448L40.576 3.854L33.364 12.486Z"></path></g></svg></a>
+    <nav class="nav" aria-label="Main">
+      <a href="#pieces">Pieces</a>
+      <a href="#how">How it works</a>
+      <a href="#membership">Membership</a>
+      <a href="#gift">Gifting</a>
+    </nav>
+  </div>
+  <div class="hd-r">
+    <div class="hd-langs" role="group" aria-label="Language" data-lang>
+      <button type="button" class="lang" aria-pressed="true">EN</button>
+      <button type="button" class="lang" aria-pressed="false" lang="ar">ع</button>
+    </div>
+    <a class="hd-signin" href="#signin">Sign in</a>
+    <a class="btn btn-w hd-join" href="#membership">Become a member</a>
+    <button type="button" class="menu-b" aria-label="Open menu" aria-controls="menu" aria-expanded="false" data-menu-open><svg aria-hidden="true" width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M3 8h16"/><path d="M3 14h16"/></svg></button>
+  </div>
+</header>
+
+<div class="sheet" id="menu" data-menu role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="sheet-top">
+    <a class="logo" href="#top" aria-label="Iconec home"><svg viewBox="0 0 220 84.29" fill="currentColor" role="img" aria-label="Iconec"><path d="M2.039 82.958V10.407H0V9.074H10.749V10.407H8.71V82.958H10.749V84.291H0V82.958H2.039Z"></path><path d="M18.686 65.011V28.352C18.686 22.874 20.757 17.638 24.366 13.983C27.438 10.871 31.403 9.127 35.529 9.074H35.581C39.691 9.139 43.643 10.881 46.702 13.983C50.267 17.591 52.336 22.764 52.381 28.172V35.035H45.712V21.975C45.673 18.709 44.41 15.579 42.251 13.393C40.402 11.52 38.019 10.46 35.538 10.407C33.053 10.457 30.667 11.518 28.818 13.391C26.658 15.577 25.398 18.709 25.357 21.984V71.386C25.396 74.652 26.658 77.782 28.816 79.968C30.666 81.841 33.051 82.902 35.534 82.954C39.367 82.901 43.051 81.279 45.906 78.387C49.268 74.985 51.194 70.11 51.194 65.009V64.516H52.381V65.009C52.381 70.485 50.31 75.723 46.701 79.376C43.629 82.488 39.666 84.232 35.539 84.287H35.531L35.536 83.794L35.528 84.287C31.402 84.232 27.438 82.488 24.366 79.376C20.757 75.723 18.686 70.485 18.686 65.009V65.011Z"></path><path d="M107.554 9.074L133.984 80.292V14.861C133.889 13.653 133.399 12.533 132.601 11.706C131.793 10.868 130.743 10.407 129.642 10.407H129.202V9.074H137.208V10.407H135.17V84.291H128.696L102.266 13.073V78.501C102.361 79.71 102.851 80.83 103.649 81.657C104.457 82.495 105.507 82.956 106.608 82.956H107.048V84.289H99.042V82.956H101.08V10.407H99.042V9.074H107.554Z"></path><path d="M145.724 82.956V10.405H143.685V9.072H179.816V21.976H178.629V21.483C178.629 15.609 174.547 10.745 169.334 10.403H152.397V46.012H163.017C166.237 45.797 168.759 42.791 168.759 39.161V38.668H169.946V54.687H168.759V54.194C168.759 50.565 166.237 47.557 163.017 47.343H152.397V82.951H169.334C174.548 82.609 178.629 77.745 178.629 71.872V71.379H179.816V84.282H143.685V82.949H145.724V82.956Z"></path><path d="M186.303 65.011V28.352C186.303 22.874 188.374 17.638 191.984 13.983C195.055 10.871 199.02 9.127 203.147 9.074H203.199C207.308 9.139 211.26 10.881 214.32 13.983C217.884 17.591 219.953 22.764 219.998 28.172V35.035H213.329V21.975C213.29 18.709 212.028 15.579 209.868 13.393C208.021 11.52 205.636 10.46 203.155 10.407C200.67 10.457 198.284 11.518 196.433 13.391C194.274 15.577 193.013 18.709 192.973 21.984V71.386C193.011 74.652 194.274 77.782 196.433 79.968C198.283 81.841 200.669 82.902 203.152 82.954C206.984 82.901 210.668 81.279 213.523 78.387C216.885 74.985 218.811 70.11 218.811 65.009V64.516H219.998V65.009C219.998 70.485 217.928 75.723 214.318 79.376C211.246 82.488 207.283 84.232 203.157 84.287H203.148L203.152 83.794L203.143 84.287C199.017 84.232 195.054 82.488 191.982 79.376C188.372 75.723 186.302 70.485 186.302 65.009L186.303 65.011Z"></path><g transform="translate(58.82 0) scale(0.52775)"><path d="M36.942 17.629C40.341 13.429 47.362 5.086 47.362 5.086V1.976H45.192V4.162C45.192 4.162 34.594 17.251 34.591 17.254V19.989C38.343 20.638 41.949 22.506 44.805 25.397C48.897 29.54 51.286 35.471 51.362 41.66V135.269C51.289 141.474 48.897 147.408 44.805 151.551C41.297 155.103 36.773 157.114 32.065 157.209H31.938C27.23 157.114 22.706 155.103 19.198 151.551C15.107 147.408 12.717 141.477 12.641 135.288V41.675C12.714 35.471 15.107 29.536 19.198 25.393C22.188 22.366 26.067 20.46 30.016 19.904V17.264L19.373 4.159V1.973H17.203V5.083C17.203 5.083 24.294 13.416 27.69 17.585C21.692 18.503 16.295 21.264 11.618 25.676C11.329 25.95 11.046 26.226 10.764 26.512C3.924 33.438 0 43.362 0 53.742V123.203C0 133.582 3.924 143.504 10.764 150.429C16.584 156.326 24.094 159.63 31.919 159.735H32.011H32.09C39.906 159.63 47.416 156.326 53.236 150.429C60.076 143.507 64 133.582 64 123.206V53.742C64 43.362 60.076 33.441 53.236 26.515C48.541 21.759 43.111 18.693 36.945 17.629"></path><path d="M40.656 0.016H23.869L21.486 4.159L32.297 17.222L43.051 4.159L40.656 0.016ZM31.185 12.486L23.973 3.854L25.101 2.002H31.185V12.486ZM33.364 12.486V2.002H39.448L40.576 3.854L33.364 12.486Z"></path></g></svg></a>
+    <button type="button" class="close-b" aria-label="Close menu" data-menu-close><svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M4 4l12 12"/><path d="M16 4L4 16"/></svg></button>
+  </div>
+  <nav class="m-links" aria-label="Menu">
+    <a href="#pieces">Pieces</a>
+    <a href="#how">How it works</a>
+    <a href="#membership">Membership</a>
+    <a href="#gift">Gifting</a>
+    <a href="#signin">Sign in</a>
+  </nav>
+  <a class="btn" href="#membership">Become a member</a>
+</div>
+
+<main>
+<section id="top" class="hero" data-hero data-paused="false" data-note="On load the earrings settle from a slow zoom (2.2s), the headline rises line by line (50ms apart), then copy, buttons and offer fade up as one beat (done by 1.4s); after that the photo keeps a slow push-in that Pause stops. The header is white over the photo and turns solid after the hero.">
+  <div class="hero-media kb"><img class="kb-drift" decoding="async" src="shot-earrings.jpg" alt="A pair of diamond drop earrings in 18k gold on dark slate" width="965" height="1200" fetchpriority="high"></div>
+  <span class="hero-scrim" aria-hidden="true"></span>
+  <div class="hero-in wrap">
+    <div class="hero-copy">
+      <h1><span class="h-line"><span>Real diamonds,</span></span><span class="h-line"><span>on rotation.</span></span></h1>
+      <p class="hero-lede" data-hero-fade style="--d:400ms">Hold up to three pieces of 18k gold and IGI-certified diamonds. Swap from day 2. Never buy.</p>
+      <div class="hero-ctas" data-hero-fade style="--d:450ms">
+        <a class="btn btn-w" href="#membership">Become a member</a>
+        <a class="btn-o btn-ow" href="#pieces">See the pieces</a>
+      </div>
+    </div>
+    <div class="hero-foot" data-hero-fade style="--d:500ms">
+      <p class="hero-offer">Your first AED 299 is on us.</p>
+      <button type="button" class="pause press" aria-pressed="false" aria-label="Pause background motion" data-pause><svg class="i-pause" aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect x="3" y="2" width="2.5" height="10" rx="0.5"/><rect x="8.5" y="2" width="2.5" height="10" rx="0.5"/></svg><svg class="i-play" aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M4 2.4v9.2a.5.5 0 0 0 .76.43l7.4-4.6a.5.5 0 0 0 0-.86l-7.4-4.6A.5.5 0 0 0 4 2.4z"/></svg><span data-pause-t>Pause</span></button>
+    </div>
+  </div>
+</section>
+
+<section id="pieces" class="sec" data-note="Heading rises, then the four photos unmask upward 50ms apart (1.1s each) with each name rising just after its photo. Hover zooms the photo to 1.03 (0.24s); press dips the card.">
+  <div class="sec-head wrap" data-reveal>
+    <div class="tx">
+      <h2 class="h2">New this month</h2>
+      <p class="lede">Every piece here can be one of your three.</p>
+    </div>
+    <a class="lnk" href="#all">See all pieces</a>
+  </div>
+  <div class="wrap rail-wrap">
+    <ul class="cards num">
+      <li><a class="card press" href="#ivy"><span class="ph" data-reveal="img" style="--d:0ms"><img class="ring-crop" src="ring.jpg" alt="The Ivy, an 18k gold ring with diamonds" width="501" height="900" loading="lazy" decoding="async"></span><span class="meta" data-reveal style="--d:100ms"><b>The Ivy</b><span>Ring · Retail value AED 00,000</span></span></a></li>
+      <li><a class="card press" href="#windfall"><span class="ph" data-reveal="img" style="--d:50ms"><img src="riviere.jpg" alt="The Windfall, a two-row diamond necklace in 18k gold" width="724" height="900" loading="lazy" decoding="async"></span><span class="meta" data-reveal style="--d:150ms"><b>The Windfall</b><span>Necklace · Retail value AED 00,000</span></span></a></li>
+      <li><a class="card press" href="#p3"><span class="ph" data-reveal="img" style="--d:100ms"><img src="shot-earrings.jpg" alt="Diamond drop earrings in 18k gold" width="965" height="1200" loading="lazy" decoding="async"></span><span class="meta" data-reveal style="--d:200ms"><b>Piece name</b><span>Earrings · Retail value AED 00,000</span></span></a></li>
+      <li><a class="card press" href="#p4"><span class="ph" data-reveal="img" style="--d:150ms"><img src="pendant.jpg" alt="A diamond leaf pendant in 18k gold with a red drop" width="724" height="900" loading="lazy" decoding="async"></span><span class="meta" data-reveal style="--d:250ms"><b>Piece name</b><span>Pendant · Retail value AED 00,000</span></span></a></li>
+    </ul>
+  </div>
+</section>
+
+<section id="how" class="sec wrap" data-note="The four steps arrive 50ms apart: each top rule draws left to right (0.9s) and its text rises just behind it.">
+  <div class="sec-head stack" data-reveal>
+    <h2 class="h2">How it works</h2>
+    <p class="lede">Join on the website in three steps. Then the month runs on its own.</p>
+  </div>
+  <ol class="steps num">
+    <li class="steps-top rule" data-reveal="rule" aria-hidden="true"></li>
+    <li class="step"><span class="rule" data-reveal="rule" aria-hidden="true" style="--d:0ms"></span><div class="step-tx" data-reveal style="--d:100ms"><h3><span class="n">1</span>&#160;&#160;Choose a plan</h3><p>1, 2 or 3 pieces at a time, from AED 299 a month.</p></div></li>
+    <li class="step"><span class="rule" data-reveal="rule" aria-hidden="true" style="--d:50ms"></span><div class="step-tx" data-reveal style="--d:150ms"><h3><span class="n">2</span>&#160;&#160;Pick your pieces</h3><p>18k gold, IGI-certified diamonds.</p></div></li>
+    <li class="step"><span class="rule" data-reveal="rule" aria-hidden="true" style="--d:100ms"></span><div class="step-tx" data-reveal style="--d:200ms"><h3><span class="n">3</span>&#160;&#160;Set a delivery</h3><p>No waitlist, no approval.</p></div></li>
+    <li class="step"><span class="rule soft" data-reveal="rule" aria-hidden="true" style="--d:150ms"></span><div class="step-tx" data-reveal style="--d:250ms"><h3>Then, swap from day 2</h3><p>Return by day 30, or extend by 30 days.</p></div></li>
+  </ol>
+</section>
+
+<section id="membership" class="sec wrap" data-note="Pick 1, 2 or 3: a new tray slot wipes open upward over its settling photo (0.24s), a removed one fades back to the empty frame (0.2s), and the price counts to the new amount (0.28s). Tap an empty slot to choose that plan.">
+  <div class="mem">
+    <div class="m-head" data-reveal>
+      <h2 class="h2">Membership</h2>
+      <p class="lede">Choose how many pieces you hold at a time.<span class="d-only"> Change them from day 2.</span></p>
+    </div>
+    <div class="m-seg num" role="radiogroup" aria-label="Pieces at a time" data-reveal style="--d:50ms">
+      <button type="button" class="seg" role="radio" aria-checked="false" tabindex="-1" data-plan="0"><b>1 piece</b><span>AED 299</span></button>
+      <button type="button" class="seg" role="radio" aria-checked="true" tabindex="0" data-plan="1"><b>2 pieces</b><span>AED 450</span></button>
+      <button type="button" class="seg" role="radio" aria-checked="false" tabindex="-1" data-plan="2"><b>3 pieces</b><span>AED 599</span></button>
+    </div>
+    <div class="m-price num" data-reveal style="--d:100ms">
+      <span class="rule" aria-hidden="true"></span>
+      <span class="big" data-count data-price aria-live="polite">AED 450</span><span class="small">a month · your first AED 299 is on us</span>
+    </div>
+    <a class="btn m-cta" href="#join" data-reveal style="--d:150ms">Become a member</a>
+    <p class="m-note num" data-reveal style="--d:200ms"><span data-count data-price>AED 450</span> a month. Your first AED 299 is on us.</p>
+    <ol class="tray" aria-label="Your pieces" data-stagger="50">
+      <li><div class="slot" data-slot="0">
+        <figure class="fig"><span class="frame" data-reveal="img"><span class="fill"><img class="ring-crop" src="ring.jpg" alt="The Ivy ring, first piece" width="501" height="900" loading="lazy" decoding="async"></span></span><figcaption>The Ivy</figcaption></figure></div></li>
+      <li><div class="slot" data-slot="1">
+        <figure class="fig"><span class="frame" data-reveal="img"><span class="fill"><img src="riviere.jpg" alt="The Windfall necklace, second piece" width="724" height="900" loading="lazy" decoding="async"></span></span><figcaption>The Windfall</figcaption></figure>
+        <button type="button" class="add press" data-pick="1" aria-label="Move to 2 pieces, AED 450 a month"><span class="add-f"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M3 10h14"/><path d="M10 3v14"/></svg><span class="add-t">Add a piece</span></span><span class="add-c num"><span class="d-only">2 pieces, AED 450</span><span class="m-only">Add a piece</span></span></button></div>
+      </li>
+      <li><div class="slot empty" data-slot="2">
+        <figure class="fig"><span class="frame" data-reveal="img"><span class="fill"><img src="shot-earrings.jpg" alt="Diamond earrings, third piece" width="965" height="1200" loading="lazy" decoding="async"></span></span><figcaption>Piece name</figcaption></figure>
+        <button type="button" class="add press" data-pick="2" aria-label="Move to 3 pieces, AED 599 a month"><span class="add-f"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M3 10h14"/><path d="M10 3v14"/></svg><span class="add-t">Add a piece</span></span><span class="add-c num"><span class="d-only">3 pieces, AED 599</span><span class="m-only">Add a piece</span></span></button></div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="sec trust-sec" data-note="The pendant photo unmasks upward (1.1s) and is the one image on the page that drifts against the scroll; the heading rises and the spec table's top rule draws, rows stepping in 50ms apart.">
+  <div class="trust">
+    <div class="ph" data-reveal="img"><span class="plx" data-parallax="0.06"><img src="pendant.jpg" alt="A diamond leaf pendant with a red drop on dark slate" width="724" height="900" loading="lazy" decoding="async"></span></div>
+    <div class="trust-tx">
+      <div class="tx" data-reveal style="display:flex;flex-direction:column;gap:10px">
+        <h2 class="h2">Real, certified, cared for</h2>
+        <p class="lede">Every piece is 18k gold. Every diamond comes with its IGI certificate.</p>
+      </div>
+      <dl class="specs num" data-stagger="50">
+        <span class="rule" data-reveal="rule" aria-hidden="true" style="display:block"></span>
+        <div class="row" data-reveal><dt>Metal</dt><dd>18k gold</dd></div>
+        <div class="row" data-reveal><dt>Diamonds</dt><dd>IGI-certified</dd></div>
+        <div class="row" data-reveal><dt>Between members</dt><dd><span class="d-only">[Care process placeholder]</span><span class="m-only">[Care placeholder]</span></dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section id="gift" class="sec wrap" data-note="Text rises first, then the Windfall photo unmasks upward (1.1s) and stays still, so the pendant above keeps the only parallax.">
+  <div class="gift">
+    <div class="gift-tx" data-reveal>
+      <h2 class="h2">Give a membership</h2>
+      <p class="lede">Choose 1, 2 or 3 pieces for someone. They pick their own.</p>
+      <a class="btn-o" href="#gift-start">Gift a membership</a>
+    </div>
+    <div class="ph" data-reveal="img" style="--d:50ms"><img src="riviere.jpg" alt="The Windfall necklace on dark slate" width="724" height="900" loading="lazy" decoding="async"></div>
+  </div>
+</section>
+
+<section id="faq" class="sec wrap" data-note="Heading rises, questions step in 50ms apart; an answer opens in 0.28s and closes faster (0.2s) while the plus turns to a minus.">
+  <div class="faq">
+    <div class="faq-h" data-reveal>
+      <h2 class="h2">Questions</h2>
+      <p class="lede">Can't find yours? <a class="lnk" href="#contact" style="font-size:inherit">Contact us</a></p>
+    </div>
+    <div class="faq-l" data-stagger="50">
+      <span class="rule" data-reveal="rule" aria-hidden="true"></span>
+      <details class="acc" open data-reveal><summary class="press">Who can become a member?<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 8h12"/><path class="plus-v" d="M8 2v12"/></svg></summary><div class="acc-body"><p>Anyone can join on the website. Choose a plan, pick your pieces and set a delivery. There is no waitlist and no approval.</p></div></details>
+      <details class="acc" data-reveal><summary class="press">Do I ever have to buy a piece?<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 8h12"/><path class="plus-v" d="M8 2v12"/></svg></summary><div class="acc-body"><p>No. You hold, wear and swap. Nothing to buy.</p></div></details>
+      <details class="acc" data-reveal><summary class="press">What happens on day 30?<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 8h12"/><path class="plus-v" d="M8 2v12"/></svg></summary><div class="acc-body"><p>Pieces are due back by day 30. You can extend any piece by 30 days.</p></div></details>
+      <details class="acc" data-reveal><summary class="press">What if a piece is lost or damaged?<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 8h12"/><path class="plus-v" d="M8 2v12"/></svg></summary><div class="acc-body"><p>[Answer placeholder: cover, deposit and what happens next.]</p></div></details>
+    </div>
+  </div>
+</section>
+
+<div class="ft-in">
+  <section id="join" class="join" data-note="The ink rule draws across (0.9s) while the closing line and button rise just behind it, 50ms apart.">
+    <span class="rule" data-reveal="rule" aria-hidden="true"></span>
+    <div class="join-tx" data-reveal style="--d:50ms">
+      <h2 class="h2">Start with your first piece</h2>
+      <p class="lede">Your first AED 299 is on us.</p>
+    </div>
+    <a class="btn" href="#membership" data-reveal style="--d:100ms">Become a member</a>
+  </section>
+</div>
+</main>
+
+<footer class="ft-in ft-pad">
+  <div class="ft">
+    <span class="rule hair" aria-hidden="true"></span>
+    <div class="ft-cols" data-stagger="50">
+      <div class="ft-col" data-reveal="fade"><p>Pieces</p><a href="#r">Rings</a><a href="#n">Necklaces</a><a href="#e">Earrings</a></div>
+      <div class="ft-col" data-reveal="fade"><p>Membership</p><a href="#how">How it works</a><a href="#membership">Plans</a><a href="#gift">Gifting</a></div>
+      <div class="ft-col" data-reveal="fade"><p>Help</p><a href="#faq">Questions</a><a href="#contact">Contact</a><a href="#delivery"><span class="d-only">Delivery and returns</span><span class="m-only">Delivery</span></a></div>
+      <div class="ft-col" data-reveal="fade"><p>Iconec</p><a href="#story">Our story</a><a href="#journal">Journal</a><a href="#ig">Instagram</a></div>
+    </div>
+    <div class="ft-base"><span>English · العربية<span class="m-only"> · UAE</span></span><div><span class="ft-cur">UAE · AED</span><span>© 2026 Iconec</span></div></div>
+  </div>
+</footer>
+
+<script src="motion.js"></script>
+<script>
+/* Hero: Pause / Play the ongoing push-in */
+(function () {
+  var hero = document.querySelector('.hero'), b = document.querySelector('[data-pause]');
+  if (!hero || !b) return;
+  var t = b.querySelector('[data-pause-t]');
+  b.addEventListener('click', function () {
+    var p = hero.getAttribute('data-paused') !== 'true';
+    hero.setAttribute('data-paused', String(p));
+    b.setAttribute('aria-pressed', String(p));
+    b.setAttribute('aria-label', p ? 'Play background motion' : 'Pause background motion');
+    t.textContent = p ? 'Play' : 'Pause';
+  });
+})();
+
+/* Membership: the plan picker fills the tray */
+(function () {
+  var prices = [299, 450, 599];
+  var segs = [].slice.call(document.querySelectorAll('.seg[data-plan]'));
+  var slots = [].slice.call(document.querySelectorAll('.slot[data-slot]'));
+  var priceEls = [].slice.call(document.querySelectorAll('[data-price]'));
+  var plan = 1;
+  function set(p, focus) {
+    if (p === plan) return;
+    plan = p;
+    segs.forEach(function (s, i) {
+      var on = i === p;
+      s.setAttribute('aria-checked', String(on));
+      s.tabIndex = on ? 0 : -1;
+      if (on && focus) s.focus();
+    });
+    slots.forEach(function (sl, i) {
+      var empty = i > p;
+      sl.classList.toggle('empty', empty);
+      var add = sl.querySelector('.add');
+      if (add) add.tabIndex = empty ? 0 : -1;
+    });
+    priceEls.forEach(function (el) { window.countTo(el, prices[p], 'AED '); });
+  }
+  slots.forEach(function (sl, i) { var a = sl.querySelector('.add'); if (a) a.tabIndex = sl.classList.contains('empty') ? 0 : -1; });
+  segs.forEach(function (s, i) {
+    s.addEventListener('click', function () { set(i); });
+    s.addEventListener('keydown', function (e) {
+      var d = (e.key === 'ArrowRight' || e.key === 'ArrowDown') ? 1 : (e.key === 'ArrowLeft' || e.key === 'ArrowUp') ? -1 : 0;
+      if (d) { e.preventDefault(); set((i + d + segs.length) % segs.length, true); }
+    });
+  });
+  document.querySelectorAll('.add[data-pick]').forEach(function (a) {
+    a.addEventListener('click', function () {
+      var p = parseInt(a.getAttribute('data-pick'), 10);
+      set(p);
+      segs[p].focus();
+    });
+  });
+})();
+</script>
+</body>
+</html>

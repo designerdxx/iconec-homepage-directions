@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>(function(d){var h=d.documentElement;h.classList.add("js");var s=/[?&]still\b/.test(location.search);if(s)h.classList.add("still");if(s||(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches))h.classList.add("rm");})(document)</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Maison · Iconec motion prototype</title>
+<meta name="iconec-index" content="index.html">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500&display=swap">
+<link rel="stylesheet" href="base.css">
+<style>
+/* The Maison · after prada.com: quiet full-screen chapters, objects on plinths, centred small type */
+:root{
+  --ink:#141A14; --sub:#5C615A; --sub-stone:#565B53; --line:rgba(20,26,20,.12);
+  --plinth:#F2F2F0; --slate:#1E2420;
+  --side:clamp(20px,2.8vw,40px);
+  --chapter:clamp(600px,59.7vw,860px);
+}
+body{background:#FFFFFF;color:var(--ink)}
+h1,h2{font-size:20px;line-height:1.3;letter-spacing:-.01em}
+.sub{color:var(--sub)}
+.center{display:flex;flex-direction:column;align-items:center;text-align:center}
+
+/* link styles from the source */
+.lnk{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px;text-decoration-color:rgba(20,26,20,.3);transition:text-decoration-color var(--t-ui) var(--ease-out)}
+.lnk:hover{text-decoration-color:var(--ink)}
+.lnk-w{color:#FFFFFF;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:6px;text-decoration-color:rgba(255,255,255,.6);transition:text-decoration-color var(--t-ui) var(--ease-out),transform var(--t-press) var(--ease-out)}
+.lnk-w:hover{text-decoration-color:#FFFFFF}
+
+/* header */
+.hdr{height:64px;padding:0 var(--side);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;background:#FFFFFF;color:var(--ink)}
+.hdr-l{display:flex;align-items:center;gap:28px}
+.hdr-r{display:flex;align-items:center;justify-content:flex-end;gap:24px}
+.hd{display:inline-flex;align-items:center;gap:8px;height:40px;font-size:13px;transition:color var(--t-ui) var(--ease-out),transform var(--t-press) var(--ease-out)}
+.hd:hover{color:var(--green)}
+.hd-acc{width:40px;justify-content:center}
+.logo{display:flex;align-items:center;color:var(--ink);transition:transform var(--t-press) var(--ease-out)}
+.logo svg{height:18px;width:auto;display:block}
+.langs{display:flex;gap:2px}
+.lang{font-family:"Overused Grotesk","Noto Kufi Arabic",sans-serif;height:32px;min-width:34px;padding:0 9px;border-radius:999px;font-size:13px;color:var(--sub);opacity:1;transition:box-shadow var(--t-ui) var(--ease-out),color var(--t-ui) var(--ease-out),transform var(--t-press) var(--ease-out)}
+.lang[aria-pressed="true"]{color:var(--ink);box-shadow:inset 0 0 0 1px rgba(20,26,20,.22)}
+.hd-txt{display:inline}
+
+/* menu sheet: full screen on phones, a side panel on wider screens (engine timing: 300ms in, 220ms out, dimmed backdrop) */
+.m-top{display:flex;align-items:center;justify-content:space-between;height:44px;margin-bottom:24px}
+.m-top .logo svg{height:16px}
+.m-close{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;margin-right:-10px}
+.m-links a{font-size:28px}
+.m-cta{margin-top:auto;padding-top:32px}
+.m-cta .btn{width:100%}
+@media (min-width:761px){
+  [data-menu]{left:auto;width:min(440px,100%);box-shadow:-1px 0 0 var(--line),-40px 0 80px -40px rgba(20,26,20,.25)}
+  .m-links a{font-size:20px;letter-spacing:-.01em;padding:14px 0}
+}
+
+/* full-screen chapters: photo in a clipped frame that drifts slower than the page */
+.chapter{position:relative;height:var(--chapter);overflow:hidden;background:var(--slate);color:#FFFFFF}
+.chapter-frame{position:absolute;inset:0;overflow:hidden}
+.chapter-frame img{width:100%;height:100%;object-fit:cover}
+.scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(12,15,12,0) 50%,rgba(12,15,12,.55) 100%);pointer-events:none}
+.cap{position:absolute;left:var(--side);right:var(--side);bottom:104px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.cap p{font-size:16px;color:rgba(255,255,255,.9);text-wrap:balance}
+.cap-links{display:flex;gap:28px;margin-top:10px;font-size:13px}
+#top .chapter-frame img{object-position:50% 62%}
+#windfall{margin-top:128px}
+#windfall .chapter-frame img{object-position:50% 72%}
+
+/* pieces on plinths */
+#pieces{padding:128px var(--side) 0}
+.pieces-head{gap:10px;margin-bottom:40px}
+.ptabs{display:flex;gap:32px;margin-top:6px}
+.ptab{display:inline-flex;align-items:center;height:40px;font-size:16px;color:var(--sub);transition:color var(--t-ui) var(--ease-out),transform var(--t-press) var(--ease-out)}
+.ptab:hover{color:var(--ink)}
+.ptab[aria-current="true"]{color:var(--ink);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:8px}
+.rail{--per:4;--gap:8px;display:flex;gap:var(--gap);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.rail::-webkit-scrollbar{display:none}
+.rail>li{flex:0 0 calc((100% - (var(--per) - 1) * var(--gap)) / var(--per));scroll-snap-align:start;min-width:0}
+.tile{display:flex;flex-direction:column}
+.plinth{display:flex;align-items:center;justify-content:center;aspect-ratio:4/5;background:var(--plinth);overflow:hidden}
+.obj{display:block;width:54%}
+.obj img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover}
+.obj-ring img{object-position:50% 25%}
+.obj-tbc{width:auto;font-size:13px;color:var(--sub)}
+.tile-name{padding-top:16px;text-align:center;font-size:13px}
+/* tile background fades, then the object rises 12px */
+html.js .rail [data-reveal] .obj{opacity:0;transform:translate3d(0,12px,0);transition:opacity var(--t-reveal) var(--ease-out),transform calc(var(--t-reveal) + .1s) var(--ease-out);transition-delay:calc(var(--d,0ms) + 320ms)}
+html.js .rail [data-reveal].in .obj{opacity:1;transform:none}
+/* hover zoom uses the engine timing (.28s ease-out) and its 1.03 scale; hover-capable pointers only */
+.zoom:hover img{transform:none}
+@media (hover:hover){.tile:hover .zoom img{transform:scale(1.03)}}
+
+.prog{display:flex;align-items:center;justify-content:center;gap:32px;margin-top:40px}
+.track{--p:0;--tw:25%;position:relative;width:min(480px,60vw);height:1px;background:var(--line)}
+.thumb{position:absolute;top:0;left:0;width:var(--tw);height:1px;background:var(--ink);transform:translate3d(calc(var(--p) * var(--travel,360px)),0,0)}
+.arrow{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:999px;box-shadow:inset 0 0 0 1px rgba(20,26,20,.2);transition:box-shadow var(--t-ui) var(--ease-out),transform var(--t-press) var(--ease-out)}
+.arrow:hover{box-shadow:inset 0 0 0 1px var(--ink)}
+.arrow svg{transition:transform var(--t-ui) var(--ease-out)}
+.arrow[data-end="true"] svg{transform:rotate(180deg)}
+
+/* membership: centred underlined tabs */
+#membership{padding:144px var(--side) 0}
+#membership .lead{margin-top:10px}
+.ptablist{position:relative;display:flex;gap:40px;margin-top:24px}
+.tab{height:44px;padding:0 2px;font-size:16px;color:var(--sub);transition:color var(--t-ui) var(--ease-out),transform var(--t-press) var(--ease-out)}
+.tab:hover,.tab[aria-selected="true"]{color:var(--ink)}
+html:not(.js) .tab[aria-selected="true"]{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:10px}
+/* the underline is a 100px hairline placed and sized with one transform (translate + scaleX), so nothing re-lays out */
+.tab-ind{position:absolute;left:0;bottom:5px;height:1px;width:100px;background:var(--ink);transform-origin:0 50%;transform:scaleX(0)}
+.tab-ind.ready{transition:transform var(--t-ui) var(--ease-out)}
+html:not(.js) .tab-ind{display:none}
+.plan-rule{width:100%;max-width:560px;height:1px;background:var(--line);margin-top:40px}
+html.js .plan-rule[data-reveal="rule"],html.js .how-rule[data-reveal="rule"]{transform-origin:50% 50%}
+.plan{width:100%;max-width:560px;padding-top:40px}
+.plan-panels{min-height:calc(1.1em + 44px)}
+.price{display:flex;align-items:baseline;justify-content:center;gap:8px}
+.price b{font-weight:400;font-size:32px;line-height:1.1;letter-spacing:-.02em}
+.hold{margin-top:12px}
+.plan .btn{margin-top:32px;font-size:16px}
+.offer{font-size:13px;margin-top:20px}
+
+/* how it works */
+#how{padding:160px var(--side) 0}
+#how .lead{margin-top:10px}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:48px;width:100%;max-width:960px;margin-top:56px}
+.steps li{display:flex;flex-direction:column;align-items:center;gap:8px}
+.steps h3{font-size:16px;font-weight:500;line-height:1.4}
+.steps p{max-width:18em}
+.how-rule{width:100%;max-width:560px;height:1px;background:var(--line);margin-top:56px}
+.how-note{padding-top:32px;text-wrap:balance}
+
+/* questions */
+#faq{padding:160px var(--side) 0}
+#faq .lead{margin-top:10px}
+.faq{width:100%;max-width:720px;text-align:left;margin-top:40px;border-top:1px solid var(--line)}
+.acc{border-bottom:1px solid var(--line)}
+.acc summary{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0;transition:color var(--t-ui) var(--ease-out),transform var(--t-press) var(--ease-out)}
+.acc summary:hover{color:var(--green)}
+.acc summary svg{flex:none}
+.acc-body p{padding:0 0 22px;color:var(--sub);max-width:36em}
+
+/* footer */
+.ftr{margin-top:160px;background:var(--plinth);padding:64px var(--side) 36px;display:flex;flex-direction:column;gap:56px}
+.ftr-cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:24px;width:100%;max-width:960px;margin:0 auto;font-size:13px;text-align:center}
+.ftr-cols div{display:flex;flex-direction:column;gap:10px;align-items:center}
+.ftr-cols p{font-weight:500}
+.ftr-cols a{transition:color var(--t-ui) var(--ease-out),transform var(--t-press) var(--ease-out)}
+.ftr-cols a:hover{color:var(--green)}
+.ftr-base{display:flex;flex-direction:column;align-items:center;gap:16px;font-size:13px;color:var(--sub-stone)}
+.ftr-base .logo svg{height:16px}
+.ftr-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 24px}
+
+/* pressed states: every control gives a .97 press (the summary row is wide, so .98) */
+.hd:active,.logo:active,.ptab:active,.cap-links a:active,.ftr-cols a:active{transform:scale(.97)}
+.acc summary:active{transform:scale(.98)}
+
+/* tablet */
+@media (max-width:1100px){
+  .rail{--per:3}
+  .steps{column-gap:32px}
+}
+
+/* phone */
+@media (max-width:760px){
+  body{font-size:15px}
+  .hdr{height:56px;padding:0 6px}
+  .hdr-l{gap:0}
+  .hd{width:44px;height:44px;justify-content:center;gap:0}
+  .hd-txt,.hd-wide{display:none}
+  .logo{min-height:44px}
+  .logo svg{height:16px}
+  .hdr-r{gap:0}
+  .langs{gap:0}
+  .lang{height:44px;min-width:44px;padding:0 6px;border-radius:0}
+  .lang[aria-pressed="true"]{box-shadow:none}
+
+  .chapter{height:720px}
+  .cap{left:20px;right:20px;bottom:40px;gap:8px}
+  .cap p{font-size:15px}
+  .cap-links{gap:24px;margin-top:4px;font-size:15px}
+  .cap-links a{display:inline-flex;align-items:center;min-height:44px}
+  #top .chapter-frame img,#windfall .chapter-frame img{object-position:50% 50%}
+  .scrim{background:linear-gradient(180deg,rgba(12,15,12,0) 50%,rgba(12,15,12,.6) 100%)}
+  #windfall{margin-top:80px}
+
+  #pieces{padding:80px 0 0}
+  .pieces-head{gap:8px;margin-bottom:24px;padding:0 20px}
+  .ptabs{gap:28px;margin-top:0}
+  .ptab{min-height:44px;font-size:15px}
+  .rail{--per:2;--gap:4px;padding:0 4px;scroll-padding-inline:4px}
+  .obj{width:58%}
+  .tile-name{padding-top:10px}
+  .prog{gap:24px;margin-top:28px}
+  .track{width:240px;--tw:50%}
+
+  #membership{padding:96px 20px 0}
+  #membership .lead{margin-top:8px}
+  .ptablist{width:100%;gap:0;box-shadow:inset 0 -1px 0 var(--line)}
+  .tab{flex:1;height:48px;font-size:15px;text-align:center;padding:0}
+  .tab-ind{bottom:0}
+  html:not(.js) .tab[aria-selected="true"]{text-decoration:none;box-shadow:inset 0 -1px 0 var(--ink)}
+  .plan-rule{display:none}
+  .plan{max-width:none}
+  .price b{font-size:28px}
+  .hold{margin-top:10px;max-width:20em;margin-left:auto;margin-right:auto}
+  .plan .btn{margin-top:28px;width:100%;font-size:15px}
+  .offer{margin-top:16px}
+
+  #how{padding:112px 20px 0}
+  #how .lead{margin-top:8px}
+  .steps{display:flex;flex-direction:column;gap:28px;margin-top:40px}
+  .steps li{gap:4px}
+  .steps h3{font-size:15px}
+  .steps p{max-width:none}
+  .how-rule{max-width:none;margin-top:40px}
+  .how-note{padding-top:28px}
+
+  #faq{padding:112px 20px 0}
+  #faq .lead{margin-top:4px}
+  .faq{margin-top:24px}
+  .acc summary{padding:0;min-height:60px}
+  .acc-body p{padding:0 0 20px}
+
+  .ftr{margin-top:112px;padding:40px 20px 28px;gap:32px}
+  .ftr-cols{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:24px;column-gap:16px}
+  .ftr-cols div{gap:0}
+  .ftr-cols p{padding-bottom:4px}
+  .ftr-cols a{display:flex;align-items:center;justify-content:center;min-height:44px}
+  .ftr-base{gap:8px}
+  .ftr-base .logo{min-height:44px}
+  .ftr-meta{gap:4px 16px}
+  .d-wide{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr" data-header data-note="Header stays solid white; tucks away on a fast scroll down (0.26s) and slides back on scroll up (0.36s).">
+  <div class="hdr-l">
+    <button class="hd" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu" data-menu-open><svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 5h14"/><path d="M2 9h14"/><path d="M2 13h14"/></svg><span class="hd-txt">Menu</span></button>
+    <button class="hd" type="button" aria-label="Search"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><circle cx="7" cy="7" r="5"/><path d="M10.6 10.6l3.9 3.9"/></svg><span class="hd-txt">Search</span></button>
+  </div>
+  <a class="logo" href="#top" aria-label="Iconec home"><svg viewBox="0 0 220 84.29" fill="currentColor" role="img" aria-label="Iconec"><path d="M2.039 82.958V10.407H0V9.074H10.749V10.407H8.71V82.958H10.749V84.291H0V82.958H2.039Z"></path><path d="M18.686 65.011V28.352C18.686 22.874 20.757 17.638 24.366 13.983C27.438 10.871 31.403 9.127 35.529 9.074H35.581C39.691 9.139 43.643 10.881 46.702 13.983C50.267 17.591 52.336 22.764 52.381 28.172V35.035H45.712V21.975C45.673 18.709 44.41 15.579 42.251 13.393C40.402 11.52 38.019 10.46 35.538 10.407C33.053 10.457 30.667 11.518 28.818 13.391C26.658 15.577 25.398 18.709 25.357 21.984V71.386C25.396 74.652 26.658 77.782 28.816 79.968C30.666 81.841 33.051 82.902 35.534 82.954C39.367 82.901 43.051 81.279 45.906 78.387C49.268 74.985 51.194 70.11 51.194 65.009V64.516H52.381V65.009C52.381 70.485 50.31 75.723 46.701 79.376C43.629 82.488 39.666 84.232 35.539 84.287H35.531L35.536 83.794L35.528 84.287C31.402 84.232 27.438 82.488 24.366 79.376C20.757 75.723 18.686 70.485 18.686 65.009V65.011Z"></path><path d="M107.554 9.074L133.984 80.292V14.861C133.889 13.653 133.399 12.533 132.601 11.706C131.793 10.868 130.743 10.407 129.642 10.407H129.202V9.074H137.208V10.407H135.17V84.291H128.696L102.266 13.073V78.501C102.361 79.71 102.851 80.83 103.649 81.657C104.457 82.495 105.507 82.956 106.608 82.956H107.048V84.289H99.042V82.956H101.08V10.407H99.042V9.074H107.554Z"></path><path d="M145.724 82.956V10.405H143.685V9.072H179.816V21.976H178.629V21.483C178.629 15.609 174.547 10.745 169.334 10.403H152.397V46.012H163.017C166.237 45.797 168.759 42.791 168.759 39.161V38.668H169.946V54.687H168.759V54.194C168.759 50.565 166.237 47.557 163.017 47.343H152.397V82.951H169.334C174.548 82.609 178.629 77.745 178.629 71.872V71.379H179.816V84.282H143.685V82.949H145.724V82.956Z"></path><path d="M186.303 65.011V28.352C186.303 22.874 188.374 17.638 191.984 13.983C195.055 10.871 199.02 9.127 203.147 9.074H203.199C207.308 9.139 211.26 10.881 214.32 13.983C217.884 17.591 219.953 22.764 219.998 28.172V35.035H213.329V21.975C213.29 18.709 212.028 15.579 209.868 13.393C208.021 11.52 205.636 10.46 203.155 10.407C200.67 10.457 198.284 11.518 196.433 13.391C194.274 15.577 193.013 18.709 192.973 21.984V71.386C193.011 74.652 194.274 77.782 196.433 79.968C198.283 81.841 200.669 82.902 203.152 82.954C206.984 82.901 210.668 81.279 213.523 78.387C216.885 74.985 218.811 70.11 218.811 65.009V64.516H219.998V65.009C219.998 70.485 217.928 75.723 214.318 79.376C211.246 82.488 207.283 84.232 203.157 84.287H203.148L203.152 83.794L203.143 84.287C199.017 84.232 195.054 82.488 191.982 79.376C188.372 75.723 186.302 70.485 186.302 65.009L186.303 65.011Z"></path><g transform="translate(58.82 0) scale(0.52775)"><path d="M36.942 17.629C40.341 13.429 47.362 5.086 47.362 5.086V1.976H45.192V4.162C45.192 4.162 34.594 17.251 34.591 17.254V19.989C38.343 20.638 41.949 22.506 44.805 25.397C48.897 29.54 51.286 35.471 51.362 41.66V135.269C51.289 141.474 48.897 147.408 44.805 151.551C41.297 155.103 36.773 157.114 32.065 157.209H31.938C27.23 157.114 22.706 155.103 19.198 151.551C15.107 147.408 12.717 141.477 12.641 135.288V41.675C12.714 35.471 15.107 29.536 19.198 25.393C22.188 22.366 26.067 20.46 30.016 19.904V17.264L19.373 4.159V1.973H17.203V5.083C17.203 5.083 24.294 13.416 27.69 17.585C21.692 18.503 16.295 21.264 11.618 25.676C11.329 25.95 11.046 26.226 10.764 26.512C3.924 33.438 0 43.362 0 53.742V123.203C0 133.582 3.924 143.504 10.764 150.429C16.584 156.326 24.094 159.63 31.919 159.735H32.011H32.09C39.906 159.63 47.416 156.326 53.236 150.429C60.076 143.507 64 133.582 64 123.206V53.742C64 43.362 60.076 33.441 53.236 26.515C48.541 21.759 43.111 18.693 36.945 17.629"></path><path d="M40.656 0.016H23.869L21.486 4.159L32.297 17.222L43.051 4.159L40.656 0.016ZM31.185 12.486L23.973 3.854L25.101 2.002H31.185V12.486ZM33.364 12.486V2.002H39.448L40.576 3.854L33.364 12.486Z"></path></g></svg></a>
+  <div class="hdr-r">
+    <a class="hd hd-wide" href="#contact">Contact us</a>
+    <a class="hd hd-acc hd-wide" href="#account" aria-label="Account"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.25"><circle cx="9" cy="6" r="3.25"/><path d="M2.75 16c.6-3.1 3.1-5 6.25-5s5.65 1.9 6.25 5"/></svg></a>
+    <div class="langs" role="group" aria-label="Language" data-lang>
+      <button class="lang" type="button" aria-pressed="true">EN</button>
+      <button class="lang" type="button" aria-pressed="false" lang="ar">ع</button>
+    </div>
+  </div>
+</header>
+
+<div id="menu" data-menu role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="m-top">
+    <a class="logo" href="#top" aria-label="Iconec home"><svg viewBox="0 0 220 84.29" fill="currentColor" role="img" aria-label="Iconec"><path d="M2.039 82.958V10.407H0V9.074H10.749V10.407H8.71V82.958H10.749V84.291H0V82.958H2.039Z"></path><path d="M18.686 65.011V28.352C18.686 22.874 20.757 17.638 24.366 13.983C27.438 10.871 31.403 9.127 35.529 9.074H35.581C39.691 9.139 43.643 10.881 46.702 13.983C50.267 17.591 52.336 22.764 52.381 28.172V35.035H45.712V21.975C45.673 18.709 44.41 15.579 42.251 13.393C40.402 11.52 38.019 10.46 35.538 10.407C33.053 10.457 30.667 11.518 28.818 13.391C26.658 15.577 25.398 18.709 25.357 21.984V71.386C25.396 74.652 26.658 77.782 28.816 79.968C30.666 81.841 33.051 82.902 35.534 82.954C39.367 82.901 43.051 81.279 45.906 78.387C49.268 74.985 51.194 70.11 51.194 65.009V64.516H52.381V65.009C52.381 70.485 50.31 75.723 46.701 79.376C43.629 82.488 39.666 84.232 35.539 84.287H35.531L35.536 83.794L35.528 84.287C31.402 84.232 27.438 82.488 24.366 79.376C20.757 75.723 18.686 70.485 18.686 65.009V65.011Z"></path><path d="M107.554 9.074L133.984 80.292V14.861C133.889 13.653 133.399 12.533 132.601 11.706C131.793 10.868 130.743 10.407 129.642 10.407H129.202V9.074H137.208V10.407H135.17V84.291H128.696L102.266 13.073V78.501C102.361 79.71 102.851 80.83 103.649 81.657C104.457 82.495 105.507 82.956 106.608 82.956H107.048V84.289H99.042V82.956H101.08V10.407H99.042V9.074H107.554Z"></path><path d="M145.724 82.956V10.405H143.685V9.072H179.816V21.976H178.629V21.483C178.629 15.609 174.547 10.745 169.334 10.403H152.397V46.012H163.017C166.237 45.797 168.759 42.791 168.759 39.161V38.668H169.946V54.687H168.759V54.194C168.759 50.565 166.237 47.557 163.017 47.343H152.397V82.951H169.334C174.548 82.609 178.629 77.745 178.629 71.872V71.379H179.816V84.282H143.685V82.949H145.724V82.956Z"></path><path d="M186.303 65.011V28.352C186.303 22.874 188.374 17.638 191.984 13.983C195.055 10.871 199.02 9.127 203.147 9.074H203.199C207.308 9.139 211.26 10.881 214.32 13.983C217.884 17.591 219.953 22.764 219.998 28.172V35.035H213.329V21.975C213.29 18.709 212.028 15.579 209.868 13.393C208.021 11.52 205.636 10.46 203.155 10.407C200.67 10.457 198.284 11.518 196.433 13.391C194.274 15.577 193.013 18.709 192.973 21.984V71.386C193.011 74.652 194.274 77.782 196.433 79.968C198.283 81.841 200.669 82.902 203.152 82.954C206.984 82.901 210.668 81.279 213.523 78.387C216.885 74.985 218.811 70.11 218.811 65.009V64.516H219.998V65.009C219.998 70.485 217.928 75.723 214.318 79.376C211.246 82.488 207.283 84.232 203.157 84.287H203.148L203.152 83.794L203.143 84.287C199.017 84.232 195.054 82.488 191.982 79.376C188.372 75.723 186.302 70.485 186.302 65.009L186.303 65.011Z"></path><g transform="translate(58.82 0) scale(0.52775)"><path d="M36.942 17.629C40.341 13.429 47.362 5.086 47.362 5.086V1.976H45.192V4.162C45.192 4.162 34.594 17.251 34.591 17.254V19.989C38.343 20.638 41.949 22.506 44.805 25.397C48.897 29.54 51.286 35.471 51.362 41.66V135.269C51.289 141.474 48.897 147.408 44.805 151.551C41.297 155.103 36.773 157.114 32.065 157.209H31.938C27.23 157.114 22.706 155.103 19.198 151.551C15.107 147.408 12.717 141.477 12.641 135.288V41.675C12.714 35.471 15.107 29.536 19.198 25.393C22.188 22.366 26.067 20.46 30.016 19.904V17.264L19.373 4.159V1.973H17.203V5.083C17.203 5.083 24.294 13.416 27.69 17.585C21.692 18.503 16.295 21.264 11.618 25.676C11.329 25.95 11.046 26.226 10.764 26.512C3.924 33.438 0 43.362 0 53.742V123.203C0 133.582 3.924 143.504 10.764 150.429C16.584 156.326 24.094 159.63 31.919 159.735H32.011H32.09C39.906 159.63 47.416 156.326 53.236 150.429C60.076 143.507 64 133.582 64 123.206V53.742C64 43.362 60.076 33.441 53.236 26.515C48.541 21.759 43.111 18.693 36.945 17.629"></path><path d="M40.656 0.016H23.869L21.486 4.159L32.297 17.222L43.051 4.159L40.656 0.016ZM31.185 12.486L23.973 3.854L25.101 2.002H31.185V12.486ZM33.364 12.486V2.002H39.448L40.576 3.854L33.364 12.486Z"></path></g></svg></a>
+    <button class="m-close" type="button" aria-label="Close menu" data-menu-close><svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M3.5 3.5l11 11"/><path d="M14.5 3.5l-11 11"/></svg></button>
+  </div>
+  <nav class="m-links" aria-label="Main">
+    <a href="#pieces">Pieces</a>
+    <a href="#membership">Membership</a>
+    <a href="#how">How it works</a>
+    <a href="#faq">Questions</a>
+    <a href="#contact">Contact us</a>
+    <a href="#account">Account</a>
+  </nav>
+  <div class="m-cta"><a class="btn" href="#join">Become a member</a></div>
+</div>
+
+<main>
+<section id="top" class="chapter" data-hero data-note="On load the earrings settle from a 1.1 zoom (2.2s); the title rises, then the line and links fade up (all text in by 1.4s). On scroll the photo drifts slower than the page.">
+  <div class="chapter-frame kb">
+    <img src="shot-earrings.jpg" alt="Diamond drop earrings in 18k gold on dark slate" width="965" height="1200" data-parallax="0.08" fetchpriority="high" decoding="async">
+  </div>
+  <div class="scrim" aria-hidden="true"></div>
+  <div class="cap">
+    <h1><span class="h-line"><span>Real diamonds, on rotation</span></span></h1>
+    <p data-hero-fade style="--d:400ms">Hold up to three pieces of 18k&#160;gold. Swap them. Never buy.</p>
+    <div class="cap-links" data-hero-fade style="--d:450ms">
+      <a class="lnk-w" href="#membership">Become a member</a>
+      <a class="lnk-w" href="#pieces">See the pieces</a>
+    </div>
+  </div>
+</section>
+
+<section id="pieces" data-note="Plinths fade in one after another (45ms apart), then each object rises 12px (1s). The arrow glides the row one page in 0.28s; the thin bar's thumb travels with it.">
+  <div class="pieces-head center">
+    <h2 data-reveal>New this month</h2>
+    <p class="sub" data-reveal style="--d:50ms">Every piece here can be one of your three.</p>
+    <nav class="ptabs" aria-label="Pieces view" data-reveal style="--d:100ms">
+      <a class="ptab" href="#new" aria-current="true">New in</a>
+      <a class="ptab" href="#all">All pieces</a>
+    </nav>
+  </div>
+  <ul class="rail" id="rail" data-stagger aria-label="New this month">
+    <li data-reveal="fade"><a class="tile press" href="#ivy"><span class="plinth zoom"><span class="obj obj-ring"><img src="ring.jpg" alt="The Ivy, an 18k gold ring with diamonds" width="501" height="900" loading="lazy" decoding="async"></span></span><span class="tile-name">Rings</span></a></li>
+    <li data-reveal="fade"><a class="tile press" href="#windfall-piece"><span class="plinth zoom"><span class="obj"><img src="riviere.jpg" alt="The Windfall, a two-row diamond necklace in 18k gold" width="724" height="900" loading="lazy" decoding="async"></span></span><span class="tile-name">Necklaces</span></a></li>
+    <li data-reveal="fade"><a class="tile press" href="#earrings"><span class="plinth zoom"><span class="obj"><img src="shot-earrings.jpg" alt="Piece name, diamond drop earrings in 18k gold" width="965" height="1200" loading="lazy" decoding="async"></span></span><span class="tile-name">Earrings</span></a></li>
+    <li data-reveal="fade"><a class="tile press" href="#pendants"><span class="plinth zoom"><span class="obj"><img src="pendant.jpg" alt="Piece name, a diamond leaf pendant in 18k gold with a red drop" width="724" height="900" loading="lazy" decoding="async"></span></span><span class="tile-name">Pendants</span></a></li>
+    <li data-reveal="fade"><a class="tile press" href="#piece-5"><span class="plinth"><span class="obj obj-tbc">Photography to come</span></span><span class="tile-name">Piece name</span></a></li>
+    <li data-reveal="fade"><a class="tile press" href="#piece-6"><span class="plinth"><span class="obj obj-tbc">Photography to come</span></span><span class="tile-name">Piece name</span></a></li>
+  </ul>
+  <div class="prog" data-reveal="fade">
+    <div class="track" id="track" role="presentation"><span class="thumb"></span></div>
+    <button class="arrow press" id="railNext" type="button" aria-label="Next pieces" aria-controls="rail"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2.5 8h11"/><path d="M9 3.5L13.5 8 9 12.5"/></svg></button>
+  </div>
+</section>
+
+<section id="windfall" class="chapter" data-note="The necklace drifts slower than the page inside its frame; as the caption comes into view the title, line and links rise in turn (1s, 45ms apart).">
+  <div class="chapter-frame">
+    <img src="riviere.jpg" alt="The Windfall, a two-row diamond necklace in 18k gold, on dark slate" width="724" height="900" data-parallax="0.08" loading="lazy" decoding="async">
+  </div>
+  <div class="scrim" aria-hidden="true"></div>
+  <div class="cap" data-stagger>
+    <h2 data-reveal>The Windfall</h2>
+    <p data-reveal>Two rows of IGI-certified diamonds in 18k gold.</p>
+    <div class="cap-links num" data-reveal>
+      <a class="lnk-w" href="#membership">Wear it from AED 299</a>
+      <a class="lnk-w" href="#windfall-piece">View the piece</a>
+    </div>
+  </div>
+</section>
+
+<section id="membership" class="center" data-note="Tap a plan: the underline slides and resizes to it and the line below fades in (0.24s) while the price counts to the new amount (0.28s).">
+  <h2 data-reveal>Membership</h2>
+  <p class="sub lead" data-reveal style="--d:50ms">Choose how many pieces you hold at a time.</p>
+  <div class="ptablist-wrap" data-tabs id="plans" style="display:contents">
+    <div class="ptablist num" role="tablist" aria-label="Pieces at a time" data-reveal style="--d:100ms">
+      <button class="tab" type="button" role="tab" id="plan-tab-1" data-tab="1" aria-selected="true" aria-controls="plan-1">1 piece</button>
+      <button class="tab" type="button" role="tab" id="plan-tab-2" data-tab="2" aria-selected="false" aria-controls="plan-2" tabindex="-1">2 pieces</button>
+      <button class="tab" type="button" role="tab" id="plan-tab-3" data-tab="3" aria-selected="false" aria-controls="plan-3" tabindex="-1">3 pieces</button>
+      <span class="tab-ind" aria-hidden="true"></span>
+    </div>
+    <div class="plan-rule" data-reveal="rule" style="--d:150ms"></div>
+    <div class="plan" data-reveal style="--d:200ms">
+      <div class="plan-panels">
+        <div id="plan-1" role="tabpanel" aria-labelledby="plan-tab-1" data-panel="1" tabindex="0">
+          <p class="price num"><b data-count data-to="299">AED 299</b><span class="sub">a month</span></p>
+          <p class="sub hold">Hold one piece at a time. Swap it from day 2.</p>
+        </div>
+        <div id="plan-2" role="tabpanel" aria-labelledby="plan-tab-2" data-panel="2" tabindex="0" hidden>
+          <p class="price num"><b data-count data-to="450">AED 450</b><span class="sub">a month</span></p>
+          <p class="sub hold">Hold two pieces at a time. Swap either from day 2.</p>
+        </div>
+        <div id="plan-3" role="tabpanel" aria-labelledby="plan-tab-3" data-panel="3" tabindex="0" hidden>
+          <p class="price num"><b data-count data-to="599">AED 599</b><span class="sub">a month</span></p>
+          <p class="sub hold">Hold three pieces at a time. Swap any from day 2.</p>
+        </div>
+      </div>
+      <a class="btn" href="#join">Become a member</a>
+      <p class="sub offer num">Your first AED 299 is on us.</p>
+    </div>
+  </div>
+</section>
+
+<section id="how" class="center" data-note="Heading and line rise; the three steps follow 45ms apart, then the hairline draws out from the centre (0.9s).">
+  <h2 data-reveal>How it works</h2>
+  <p class="sub lead" data-reveal style="--d:50ms">Join on the website. No waitlist, no approval.</p>
+  <ol class="steps num" data-stagger>
+    <li data-reveal><h3>Choose a plan</h3><p class="sub">1, 2 or 3 pieces, from AED 299 a month.</p></li>
+    <li data-reveal><h3>Pick your pieces</h3><p class="sub">18k gold, set with IGI-certified diamonds.</p></li>
+    <li data-reveal><h3>Set a delivery</h3><p class="sub">Tell us where your pieces should arrive.</p></li>
+  </ol>
+  <div class="how-rule" data-reveal="rule"></div>
+  <p class="how-note num" data-reveal>Swap from day 2. Return by day 30, or extend by 30 days.</p>
+</section>
+
+<section id="faq" class="center" data-note="Heading rises; answers open in 0.28s and close in 0.2s while the plus turns to a minus.">
+  <h2 data-reveal>Questions</h2>
+  <p class="sub lead" data-reveal style="--d:50ms">Can't find yours? <a class="lnk" href="#contact">Contact us</a></p>
+  <div class="faq" data-reveal style="--d:100ms">
+    <details class="acc" open><summary>Who can become a member?<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 8h12"/><path class="plus-v" d="M8 2v12"/></svg></summary><div class="acc-body"><p>Anyone can join on the website. Choose a plan, pick your pieces and set a delivery. There is no waitlist and no approval.</p></div></details>
+    <details class="acc"><summary>Do I ever have to buy a piece?<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 8h12"/><path class="plus-v" d="M8 2v12"/></svg></summary><div class="acc-body"><p>No. You hold, wear and swap. Nothing to buy.</p></div></details>
+    <details class="acc"><summary>What happens on day 30?<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 8h12"/><path class="plus-v" d="M8 2v12"/></svg></summary><div class="acc-body"><p>Pieces are due back by day 30. You can extend any piece by 30 days.</p></div></details>
+    <details class="acc"><summary>What if a piece is lost or damaged?<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 8h12"/><path class="plus-v" d="M8 2v12"/></svg></summary><div class="acc-body"><p>[Answer placeholder: cover, deposit and what happens next.]</p></div></details>
+  </div>
+</section>
+</main>
+
+<footer class="ftr" id="contact" data-note="Link columns fade up 45ms apart as the footer arrives (1s).">
+  <div class="ftr-cols" data-stagger>
+    <div data-reveal><p>Pieces</p><a href="#r">Rings</a><a href="#n">Necklaces</a><a href="#e">Earrings</a></div>
+    <div data-reveal><p>Membership</p><a href="#how">How it works</a><a href="#membership">Plans</a><a href="#gift">Gifting</a></div>
+    <div data-reveal><p>Help</p><a href="#faq">Questions</a><a href="#contact">Contact us</a><a href="#delivery">Delivery<span class="d-wide"> and returns</span></a></div>
+    <div data-reveal><p>Iconec</p><a href="#story">Our story</a><a href="#journal">Journal</a><a href="#ig">Instagram</a></div>
+  </div>
+  <div class="ftr-base">
+    <a class="logo" href="#top" aria-label="Iconec home"><svg viewBox="0 0 220 84.29" fill="currentColor" role="img" aria-label="Iconec"><path d="M2.039 82.958V10.407H0V9.074H10.749V10.407H8.71V82.958H10.749V84.291H0V82.958H2.039Z"></path><path d="M18.686 65.011V28.352C18.686 22.874 20.757 17.638 24.366 13.983C27.438 10.871 31.403 9.127 35.529 9.074H35.581C39.691 9.139 43.643 10.881 46.702 13.983C50.267 17.591 52.336 22.764 52.381 28.172V35.035H45.712V21.975C45.673 18.709 44.41 15.579 42.251 13.393C40.402 11.52 38.019 10.46 35.538 10.407C33.053 10.457 30.667 11.518 28.818 13.391C26.658 15.577 25.398 18.709 25.357 21.984V71.386C25.396 74.652 26.658 77.782 28.816 79.968C30.666 81.841 33.051 82.902 35.534 82.954C39.367 82.901 43.051 81.279 45.906 78.387C49.268 74.985 51.194 70.11 51.194 65.009V64.516H52.381V65.009C52.381 70.485 50.31 75.723 46.701 79.376C43.629 82.488 39.666 84.232 35.539 84.287H35.531L35.536 83.794L35.528 84.287C31.402 84.232 27.438 82.488 24.366 79.376C20.757 75.723 18.686 70.485 18.686 65.009V65.011Z"></path><path d="M107.554 9.074L133.984 80.292V14.861C133.889 13.653 133.399 12.533 132.601 11.706C131.793 10.868 130.743 10.407 129.642 10.407H129.202V9.074H137.208V10.407H135.17V84.291H128.696L102.266 13.073V78.501C102.361 79.71 102.851 80.83 103.649 81.657C104.457 82.495 105.507 82.956 106.608 82.956H107.048V84.289H99.042V82.956H101.08V10.407H99.042V9.074H107.554Z"></path><path d="M145.724 82.956V10.405H143.685V9.072H179.816V21.976H178.629V21.483C178.629 15.609 174.547 10.745 169.334 10.403H152.397V46.012H163.017C166.237 45.797 168.759 42.791 168.759 39.161V38.668H169.946V54.687H168.759V54.194C168.759 50.565 166.237 47.557 163.017 47.343H152.397V82.951H169.334C174.548 82.609 178.629 77.745 178.629 71.872V71.379H179.816V84.282H143.685V82.949H145.724V82.956Z"></path><path d="M186.303 65.011V28.352C186.303 22.874 188.374 17.638 191.984 13.983C195.055 10.871 199.02 9.127 203.147 9.074H203.199C207.308 9.139 211.26 10.881 214.32 13.983C217.884 17.591 219.953 22.764 219.998 28.172V35.035H213.329V21.975C213.29 18.709 212.028 15.579 209.868 13.393C208.021 11.52 205.636 10.46 203.155 10.407C200.67 10.457 198.284 11.518 196.433 13.391C194.274 15.577 193.013 18.709 192.973 21.984V71.386C193.011 74.652 194.274 77.782 196.433 79.968C198.283 81.841 200.669 82.902 203.152 82.954C206.984 82.901 210.668 81.279 213.523 78.387C216.885 74.985 218.811 70.11 218.811 65.009V64.516H219.998V65.009C219.998 70.485 217.928 75.723 214.318 79.376C211.246 82.488 207.283 84.232 203.157 84.287H203.148L203.152 83.794L203.143 84.287C199.017 84.232 195.054 82.488 191.982 79.376C188.372 75.723 186.302 70.485 186.302 65.009L186.303 65.011Z"></path><g transform="translate(58.82 0) scale(0.52775)"><path d="M36.942 17.629C40.341 13.429 47.362 5.086 47.362 5.086V1.976H45.192V4.162C45.192 4.162 34.594 17.251 34.591 17.254V19.989C38.343 20.638 41.949 22.506 44.805 25.397C48.897 29.54 51.286 35.471 51.362 41.66V135.269C51.289 141.474 48.897 147.408 44.805 151.551C41.297 155.103 36.773 157.114 32.065 157.209H31.938C27.23 157.114 22.706 155.103 19.198 151.551C15.107 147.408 12.717 141.477 12.641 135.288V41.675C12.714 35.471 15.107 29.536 19.198 25.393C22.188 22.366 26.067 20.46 30.016 19.904V17.264L19.373 4.159V1.973H17.203V5.083C17.203 5.083 24.294 13.416 27.69 17.585C21.692 18.503 16.295 21.264 11.618 25.676C11.329 25.95 11.046 26.226 10.764 26.512C3.924 33.438 0 43.362 0 53.742V123.203C0 133.582 3.924 143.504 10.764 150.429C16.584 156.326 24.094 159.63 31.919 159.735H32.011H32.09C39.906 159.63 47.416 156.326 53.236 150.429C60.076 143.507 64 133.582 64 123.206V53.742C64 43.362 60.076 33.441 53.236 26.515C48.541 21.759 43.111 18.693 36.945 17.629"></path><path d="M40.656 0.016H23.869L21.486 4.159L32.297 17.222L43.051 4.159L40.656 0.016ZM31.185 12.486L23.973 3.854L25.101 2.002H31.185V12.486ZM33.364 12.486V2.002H39.448L40.576 3.854L33.364 12.486Z"></path></g></svg></a>
+    <div class="ftr-meta"><span>English · <span lang="ar">العربية</span></span><span>UAE · AED</span><span>© 2026 Iconec</span></div>
+  </div>
+</footer>
+
+<script src="motion.js"></script>
+<script>
+/* The Maison: sliding tab underline + price tween, and the pieces carousel */
+(function () {
+  var reduce = window.iconecReduce ? window.iconecReduce() : false;
+  var EASE = function (p) { return 1 - Math.pow(1 - p, 4); }; /* quart-out, same curve as countTo */
+
+  /* membership tabs: one hairline moves and resizes with a single transform (240ms ease-out);
+     price counts from the last shown amount (countTo, 280ms) */
+  var root = document.getElementById('plans');
+  var list = root.querySelector('[role="tablist"]');
+  var ind = list.querySelector('.tab-ind');
+  var last = 299, placeRaf = 0;
+  function place() {
+    placeRaf = 0;
+    var t = list.querySelector('[aria-selected="true"]');
+    if (!t) return;
+    var x = t.offsetLeft, w = t.offsetWidth; /* reads first, then one write */
+    ind.style.transform = 'translate3d(' + x + 'px,0,0) scaleX(' + (w / 100).toFixed(4) + ')';
+  }
+  root.addEventListener('tabchange', function (e) {
+    place();
+    var panel = root.querySelector('[data-panel="' + e.detail.key + '"]');
+    var el = panel && panel.querySelector('[data-count]');
+    if (!el) return;
+    var to = parseInt(el.getAttribute('data-to'), 10);
+    el.textContent = 'AED ' + last;
+    window.countTo(el, to, 'AED ');
+    last = to;
+  });
+  place();
+  /* first placement lands without a slide; transitions switch on after that */
+  function arm() { requestAnimationFrame(function () { ind.classList.add('ready'); }); }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { place(); arm(); }); else arm();
+  window.addEventListener('resize', function () { if (!placeRaf) placeRaf = requestAnimationFrame(place); });
+
+  /* pieces carousel: arrow glides the row one page (280ms ease-out); thumb travels with scroll position */
+  var rail = document.getElementById('rail');
+  var track = document.getElementById('track');
+  var thumb = track.querySelector('.thumb');
+  var btn = document.getElementById('railNext');
+  var raf = 0, glideRaf = 0;
+  function sync() {
+    raf = 0;
+    var max = rail.scrollWidth - rail.clientWidth;
+    var p = max > 1 ? Math.min(1, Math.max(0, rail.scrollLeft / max)) : 0;
+    var travel = track.clientWidth - thumb.offsetWidth;
+    track.style.setProperty('--travel', travel + 'px');
+    track.style.setProperty('--p', p.toFixed(4));
+    var end = max > 1 && p > 0.98;
+    btn.setAttribute('data-end', end ? 'true' : 'false');
+    btn.setAttribute('aria-label', end ? 'Back to first pieces' : 'Next pieces');
+  }
+  function queue() { if (!raf) raf = requestAnimationFrame(sync); }
+  /* the next page starts at the first tile cut off on the right, aligned to the snap edge */
+  function nextLeft() {
+    var r = rail.getBoundingClientRect();
+    var pad = parseFloat(getComputedStyle(rail).scrollPaddingLeft) || 0;
+    var max = rail.scrollWidth - rail.clientWidth;
+    if (rail.scrollLeft >= max - 2) return 0;
+    for (var i = 0; i < rail.children.length; i++) {
+      var c = rail.children[i].getBoundingClientRect();
+      if (c.right > r.right + 1) return Math.min(max, rail.scrollLeft + c.left - r.left - pad);
+    }
+    return max;
+  }
+  function glide(to) {
+    if (glideRaf) cancelAnimationFrame(glideRaf);
+    var from = rail.scrollLeft;
+    if (reduce || Math.abs(to - from) < 2) { rail.scrollLeft = to; sync(); return; }
+    var t0 = performance.now(), dur = 280;
+    rail.style.scrollSnapType = 'none'; /* snapping would fight the per-frame positions */
+    function step(t) {
+      var p = Math.min(1, (t - t0) / dur);
+      rail.scrollLeft = from + (to - from) * EASE(p);
+      if (p < 1) glideRaf = requestAnimationFrame(step);
+      else { glideRaf = 0; rail.style.scrollSnapType = ''; }
+    }
+    glideRaf = requestAnimationFrame(step);
+  }
+  rail.addEventListener('scroll', queue, { passive: true });
+  window.addEventListener('resize', queue);
+  btn.addEventListener('click', function () { glide(nextLeft()); });
+  sync();
+
+  /* tiles past the right edge are clipped by the rail, so the engine would only reveal them after a
+     carousel step (a slow entrance the visitor waits on). Reveal the whole row together instead. */
+  if (!reduce && 'IntersectionObserver' in window) {
+    var tiles = [].slice.call(rail.querySelectorAll('[data-reveal]'));
+    var rio = new IntersectionObserver(function (es) {
+      if (!es.some(function (e) { return e.isIntersecting; })) return;
+      rio.disconnect();
+      tiles.forEach(function (el) { el.classList.add('in'); });
+      setTimeout(function () { tiles.forEach(function (el) { el.classList.add('done'); }); }, 1800);
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+    rio.observe(rail);
+  }
+})();
+</script>
+</body>
+</html>

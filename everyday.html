@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>(function(d){var h=d.documentElement;h.classList.add("js");var s=/[?&]still\b/.test(location.search);if(s)h.classList.add("still");if(s||(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches))h.classList.add("rm");})(document)</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Everyday · Iconec motion prototype</title>
+<meta name="iconec-index" content="index.html">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500&display=swap">
+<link rel="stylesheet" href="base.css">
+<style>
+:root{
+  --bg:#F3EEE6; --card:#EAE3D8; --sub2:#565B53; --avatar:#D9D1C4; --night:#141A14; --on-night:#B8B3AA; --slate:#2A2D2F;
+  --g:64px;
+}
+body{background:var(--bg);color:var(--ink)}
+
+/* ---------- links ---------- */
+.lnk{font-size:13px}
+.lnk .u{background-image:linear-gradient(rgba(20,26,20,.3),rgba(20,26,20,.3));padding-bottom:3px}
+.lnk:hover .u{background-image:linear-gradient(var(--ink),var(--ink))}
+.lnk-c .u{background-image:linear-gradient(rgba(243,238,230,.45),rgba(243,238,230,.45));padding-bottom:3px}
+
+/* ---------- promo bar + header ---------- */
+.promo{min-height:40px;display:flex;align-items:center;justify-content:center;gap:16px;padding:0 20px;background:var(--night);color:var(--bg);font-size:13px}
+.promo a{display:inline-flex;align-items:center;min-height:40px}
+.promo .u{padding-top:3px}
+.hdr{height:72px;padding:0 var(--g);display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;background:var(--bg)}
+[data-header].hdr.scrolled{background:rgba(243,238,230,.98);box-shadow:0 1px 0 var(--line)}
+.logo{justify-self:start;display:flex;align-items:center;min-height:44px}
+.logo svg{height:18px;width:auto;display:block}
+.hnav{display:flex;gap:28px;font-size:13px}
+.hnav a{display:inline-flex;align-items:center;gap:4px;height:40px;padding:0 4px;transition:color var(--t-ui) var(--ease-out)}
+.hnav a svg{transition:transform var(--t-ui) var(--ease-out)}
+.hnav a:hover{color:var(--green)}
+.hnav a:hover svg{transform:translate3d(0,1px,0)}
+.hr{justify-self:end;display:flex;align-items:center;gap:20px}
+.lg{display:flex;gap:2px}
+.hdr .lang{height:32px;min-width:34px;padding:0 9px;border-radius:999px;opacity:1;color:var(--sub);font-family:"Overused Grotesk","Noto Kufi Arabic",sans-serif}
+.hdr .lang[aria-pressed="true"]{color:var(--ink);box-shadow:inset 0 0 0 1px rgba(20,26,20,.22)}
+.signin{font-size:13px;transition:color var(--t-ui) var(--ease-out)}
+.signin:hover{color:var(--green)}
+.menu-btn{display:none;width:44px;height:44px;align-items:center;justify-content:center}
+
+/* menu sheet */
+[data-menu]{background:var(--bg)}
+.m-top{display:flex;align-items:center;justify-content:space-between;min-height:44px;margin-bottom:28px}
+.m-top .logo svg{height:17px}
+.m-close{width:44px;height:44px;display:flex;align-items:center;justify-content:center;margin-right:-12px}
+[data-menu] .btn{margin-top:auto}
+
+/* ---------- type ---------- */
+.t56{font-size:56px;line-height:1.04;letter-spacing:-.028em}
+.t32{font-size:32px;line-height:1.1;letter-spacing:-.02em}
+.sec-h{display:flex;flex-direction:column;gap:8px}
+.sec-h p{color:var(--sub)}
+
+/* ---------- hero ---------- */
+.hero{padding:24px var(--g) 0;display:grid;grid-template-columns:minmax(0,608fr) minmax(0,640fr);column-gap:64px;align-items:center}
+.hero-copy{display:flex;flex-direction:column;gap:24px}
+.lede{font-size:20px;line-height:1.45;color:var(--sub);max-width:21em}
+.hero-cta{margin-top:8px}
+.hero .btn,.plan .btn,.plan .ghost{font-size:16px}
+.hero-img{position:relative;aspect-ratio:640/720;border-radius:24px;overflow:hidden;background:var(--slate);isolation:isolate}
+.hero-img img{width:100%;height:100%;object-fit:cover;object-position:50% 13%}
+
+/* ---------- how ---------- */
+.how{padding:160px var(--g) 0;display:flex;flex-direction:column;align-items:center;text-align:center;gap:20px}
+.how h2{max-width:14em}
+.how p{font-size:20px;line-height:1.45;color:var(--sub);max-width:30em;text-wrap:balance}
+.pills{display:flex;gap:10px;margin-top:12px}
+.pill-ink{display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 22px;border-radius:999px;background:var(--night);color:var(--bg);font-weight:500;font-size:16px;white-space:nowrap}
+.pill-ink:hover{background:#2A322A}
+
+/* ---------- pieces rail ---------- */
+.pieces{padding-top:128px}
+.pieces .sec-h{margin:0 var(--g) 32px}
+.rail-vp{overflow:hidden}
+.track{display:flex;gap:16px;width:max-content;padding:0 var(--g);transition:transform .3s var(--ease-out)}
+.pc{position:relative;flex:none;width:340px;height:460px;border-radius:20px;overflow:hidden;background:var(--slate);isolation:isolate}
+.pc>a{display:block;width:100%;height:100%}
+.pc img{width:100%;height:100%;object-fit:cover}
+.pc .ring img{object-position:50% 0%}
+.scrim{position:absolute;left:0;right:0;bottom:0;height:55%;background:linear-gradient(to top,rgba(10,13,10,.78),rgba(10,13,10,0));pointer-events:none}
+.pc-t{position:absolute;left:20px;right:20px;bottom:20px;display:flex;flex-direction:column;gap:2px;color:#fff}
+.pc-n{font-size:20px;font-weight:500;letter-spacing:-.01em}
+.pc-v{font-size:13px;color:rgba(255,255,255,.82)}
+.chip{position:absolute;left:16px;top:16px;display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px 0 10px;border-radius:999px;background:#fff;color:var(--ink);font-size:13px;font-weight:500;line-height:1;pointer-events:none}
+.qbtn{position:absolute;right:16px;top:16px;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:999px;background:#fff;color:var(--ink)}
+.qbtn svg{transition:transform var(--t-ui-exit) var(--ease-in)}
+.qbtn:hover svg{transform:rotate(90deg);transition:transform var(--t-ui) var(--ease-out)}
+.rail-foot{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding:0 var(--g)}
+.arrows{display:flex;gap:8px}
+.rbtn{display:inline-flex;align-items:center;justify-content:center;flex:none;width:44px;height:44px;border-radius:999px;color:var(--ink);box-shadow:inset 0 0 0 1px rgba(20,26,20,.3)}
+.rbtn:hover{box-shadow:inset 0 0 0 1px var(--ink)}
+.rbtn.on{background:var(--night);color:var(--bg);box-shadow:none}
+.rbtn[aria-disabled="true"]{cursor:default}
+
+/* ---------- plans (signature) ---------- */
+.plans-sec{padding:160px var(--g) 0}
+.plans-h{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:32px}
+.offer{font-size:13px;color:var(--sub)}
+.plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.plans>li{display:flex}
+.plan{position:relative;flex:1;display:flex;flex-direction:column;gap:40px;padding:32px;border-radius:20px;background:var(--card)}
+.plan.press:active{transform:scale(.98)}
+/* selected ring: a pseudo-element that only fades */
+.plan::before{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px var(--ink);opacity:0;pointer-events:none;transition:opacity var(--t-ui-exit) var(--ease-in)}
+.plan.on::before{opacity:1;transition:opacity var(--t-ui) var(--ease-out)}
+.pick{flex:1;display:flex;flex-direction:column;gap:40px;text-align:left}
+.pick:focus-visible{outline:none}
+.pick::after{content:"";position:absolute;inset:0;z-index:1;border-radius:20px}
+.pick:focus-visible::after{outline:2px solid var(--green);outline-offset:3px}
+.p-head{display:flex;flex-direction:column;gap:6px}
+.p-n{font-size:20px;font-weight:500;letter-spacing:-.01em;line-height:1.3}
+.p-d{color:var(--sub2)}
+.p-p{margin-top:auto;display:flex;align-items:baseline;gap:8px}
+.p-p b{font-weight:400;font-size:32px;letter-spacing:-.02em;line-height:1.2}
+.p-p span{font-size:13px;color:var(--sub2)}
+/* the CTA slot: the selected card shows "Become a member"; the others show "Choose …" (visual only; the whole card is the radio) */
+.cta{position:relative;z-index:2;display:grid;justify-items:start;pointer-events:none}
+.cta>*{grid-area:1/1}
+.cta .btn{opacity:0;visibility:hidden;transform:translate3d(0,4px,0);transition:opacity var(--t-ui-exit) var(--ease-in),transform var(--t-ui-exit) var(--ease-in),visibility 0s linear var(--t-ui-exit),background-color var(--t-ui) var(--ease-out)}
+.plan.on .cta .btn{opacity:1;visibility:visible;transform:none;pointer-events:auto;transition:opacity var(--t-ui) var(--ease-out),transform var(--t-ui) var(--ease-out),visibility 0s,background-color var(--t-ui) var(--ease-out)}
+.plan.on .cta .btn:active{transform:scale(.97);transition:transform var(--t-press) var(--ease-out)}
+.ghost{transition:opacity var(--t-ui) var(--ease-out),transform var(--t-ui) var(--ease-out),box-shadow var(--t-ui) var(--ease-out)}
+.plan:hover .ghost{box-shadow:inset 0 0 0 1px var(--ink)}
+.plan.on .ghost{opacity:0;transform:translate3d(0,-4px,0);transition:opacity var(--t-ui-exit) var(--ease-in),transform var(--t-ui-exit) var(--ease-in)}
+/* summary: slots fill with the pieces you'd hold, price counts */
+.sum-rule{height:1px;background:var(--line);margin-top:24px}
+.sum{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;column-gap:16px;padding-top:20px}
+.slots{display:flex;gap:8px}
+.slot{position:relative;flex:none;width:44px;height:44px;border-radius:50%;border:1px dashed rgba(20,26,20,.3)}
+.slot img{position:absolute;inset:-1px;width:44px;height:44px;max-width:none;border-radius:50%;object-fit:cover;background:var(--slate);opacity:0;transform:scale(.95);transition:opacity 160ms var(--ease-in),transform 160ms var(--ease-in)}
+.slot.ring img{object-position:50% 18%}
+.slot.full img{opacity:1;transform:none;transition:opacity var(--t-ui) var(--ease-out),transform var(--t-ui) cubic-bezier(.34,1.56,.64,1);transition-delay:calc(var(--i,0) * 40ms)}
+.sum-p{display:flex;align-items:baseline;gap:8px}
+.sum-p b{font-weight:400;font-size:20px;letter-spacing:-.01em}
+.sum-p span{font-size:13px;color:var(--sub)}
+
+/* ---------- members ---------- */
+.members{padding:160px var(--g) 0}
+.members h2{margin-bottom:32px}
+.quotes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.quotes>li{display:flex}
+.q{flex:1;display:flex;flex-direction:column;gap:20px;min-height:240px;padding:28px;border-radius:16px;background:var(--card)}
+.chip-q{align-self:flex-start;display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:999px;background:var(--bg);font-size:13px;font-weight:500;line-height:1}
+.q blockquote{font-size:20px;line-height:1.4;letter-spacing:-.01em}
+.who{margin-top:auto;display:flex;align-items:center;gap:12px;font-size:13px}
+.av{flex:none;width:36px;height:36px;border-radius:50%;background:var(--avatar)}
+
+/* ---------- journal ---------- */
+.journal{margin-top:160px;padding:112px var(--g) 120px;background:var(--night);color:var(--bg)}
+.j-h{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:40px}
+.j-h p{color:var(--on-night)}
+.j-grid{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:16px}
+.feat-w{height:624px;border-radius:20px;overflow:hidden;isolation:isolate;background:var(--slate)}
+.feat{position:relative;display:block;height:100%;overflow:hidden;border-radius:20px}
+.par{position:absolute;inset:0;display:block}
+.par img{width:100%;height:100%;object-fit:cover}
+html.js .feat-w.done .rv-mask{transition:transform .28s var(--ease-out)}
+html.js .feat-w.in.done .feat:hover .rv-mask{transform:scale(1.03)}
+.feat-t{position:absolute;z-index:2;left:32px;right:32px;bottom:32px;display:flex;flex-direction:column;gap:16px;color:#fff}
+.feat-t>span{display:flex;flex-direction:column;gap:6px}
+.feat-n{font-size:32px;line-height:1.12;letter-spacing:-.02em}
+.meta-w{font-size:13px;color:rgba(255,255,255,.82)}
+.pill-cream{align-self:flex-start;display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 18px;border-radius:999px;background:var(--bg);color:var(--ink);font-weight:500;font-size:13px;white-space:nowrap;transition:background-color var(--t-ui) var(--ease-out)}
+.feat:hover .pill-cream{background:#fff}
+.j-list{display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:16px}
+.jc{display:flex;flex-direction:column;justify-content:space-between;gap:16px;height:100%;padding:28px;border-radius:20px;background:var(--bg);color:var(--ink)}
+.jc:hover{background:#fff}
+.jc-t{display:flex;flex-direction:column;gap:6px;padding-right:56px}
+.jc-n{font-size:20px;line-height:1.3;letter-spacing:-.01em}
+.jc-m{font-size:13px;color:var(--sub)}
+.jc .rbtn{align-self:flex-end;width:40px;height:40px;background:var(--night);color:var(--bg);box-shadow:none}
+.jc .rbtn svg{transition:transform var(--t-ui-exit) var(--ease-in)}
+.jc:hover .rbtn svg{transform:translate3d(2px,-2px,0);transition:transform var(--t-ui) var(--ease-out)}
+.j-all{display:inline-flex;align-items:center;min-height:44px}
+
+/* ---------- faq ---------- */
+.faq{padding:160px var(--g) 128px;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px}
+.faq .sec-h{grid-column:1 / span 4;gap:10px}
+.faq .sec-h .lnk{font-size:inherit;color:var(--ink)}
+.faq-list{grid-column:6 / span 7}
+.ink-rule{height:1px;background:var(--ink)}
+details.acc{border-bottom:1px solid var(--line)}
+details.acc summary{display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:44px;padding:20px 0}
+details.acc summary svg{flex:none;transition:transform var(--t-press) var(--ease-out)}
+details.acc summary:hover svg{transform:scale(1.05)}
+.acc-body p{padding:0 0 22px;color:var(--sub);max-width:36em}
+
+/* ---------- footer ---------- */
+.foot{margin:0 var(--g);padding:56px 0 92px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:56px}
+.fcols{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;font-size:13px}
+.fcols>div{grid-column:span 2;display:flex;flex-direction:column;gap:10px}
+.fcols p{font-weight:500}
+.fcols a{align-self:flex-start;transition:color var(--t-ui) var(--ease-out)}
+.fcols a:hover{color:var(--green)}
+.fbot{display:flex;justify-content:space-between;gap:24px;font-size:13px;color:var(--sub)}
+.fbot-r{display:flex;gap:24px}
+
+/* ---------- tablet ---------- */
+@media (max-width:1100px){
+  :root{--g:40px}
+  .fcols>div{grid-column:span 3}
+}
+@media (max-width:900px) and (min-width:761px){
+  .hero{grid-template-columns:minmax(0,1fr);row-gap:40px}
+  .hero-img{aspect-ratio:5/4}
+  .hero-img img{object-position:50% 24%}
+  .plans{grid-template-columns:minmax(0,1fr)}
+  .quotes{grid-template-columns:minmax(0,1fr)}
+  .j-grid{grid-template-columns:minmax(0,1fr)}
+  .faq .sec-h{grid-column:1 / -1;margin-bottom:24px}
+  .faq-list{grid-column:1 / -1}
+}
+
+/* ---------- mobile ---------- */
+@media (max-width:760px){
+  :root{--g:20px}
+  body{font-size:15px}
+  .t56{font-size:28px;line-height:1.12;letter-spacing:-.02em}
+  .t32{font-size:28px;line-height:1.12;letter-spacing:-.02em}
+  .sec-h{gap:6px}
+  .lnk{display:inline-flex;align-items:center;min-height:44px}
+
+  .promo{gap:12px}
+  .hdr{height:60px;padding:0 8px 0 20px;display:flex;justify-content:space-between}
+  .hnav,.signin{display:none}
+  .hr{gap:0}
+  .lg{gap:0}
+  .hdr .lang{height:44px;min-width:44px;padding:0 6px}
+  .hdr .lang[aria-pressed="true"]{box-shadow:none}
+  .menu-btn{display:flex}
+  .logo svg{height:17px}
+
+  .hero{grid-template-columns:minmax(0,1fr);row-gap:28px;padding-top:24px}
+  .hero-copy{gap:20px}
+  .hero h1{font-size:40px;line-height:1.05;letter-spacing:-.028em}
+  .lede{font-size:15px;line-height:1.55}
+  .hero-cta{margin-top:0}
+  .hero .btn,.plan .btn,.plan .ghost{display:flex;width:100%;font-size:15px}
+  .hero-img{aspect-ratio:350/440;border-radius:20px}
+  .hero-img img{object-position:50% 4%}
+
+  .how{padding-top:96px;gap:16px}
+  .how p{font-size:15px;line-height:1.55;max-width:22em}
+  .pills{width:100%;gap:8px;margin-top:8px}
+  .pills .pill-ink{flex:1;height:48px;padding:0 16px;font-size:15px}
+
+  .pieces{padding-top:96px}
+  .pieces .sec-h{margin-bottom:20px}
+  .rail-vp,.q-vp{overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:20px;overscroll-behavior-x:contain;scrollbar-width:none}
+  .rail-vp::-webkit-scrollbar,.q-vp::-webkit-scrollbar{display:none}
+  .track{gap:12px;transform:none!important;transition:none}
+  .pc{width:280px;height:380px;scroll-snap-align:start}
+  .pc-t{left:18px;right:18px;bottom:18px}
+  .chip{left:14px;top:14px}
+  .qbtn{right:10px;top:8px;width:44px;height:44px}
+  .rail-foot{margin-top:0;padding-top:8px}
+  .arrows{display:none}
+
+  .plans-sec{padding-top:96px}
+  .plans-h{margin-bottom:20px}
+  .plans{grid-template-columns:minmax(0,1fr);gap:12px}
+  .plan{padding:24px;gap:20px}
+  .pick{gap:0}
+  .p-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;column-gap:12px;row-gap:8px}
+  .p-d{grid-column:1 / -1;grid-row:2}
+  .p-p{display:none}
+  .p-pm{display:flex;align-items:baseline;gap:6px}
+  .p-pm b{font-weight:400;font-size:20px;letter-spacing:-.01em}
+  .p-pm span{font-size:13px;color:var(--sub2)}
+  .cta{justify-items:stretch}
+  .sum-rule{margin-top:20px}
+  .sum{padding-top:16px;grid-template-columns:auto minmax(0,1fr);row-gap:0}
+  .slots{grid-row:1 / span 2}
+  .sum-c{align-self:end}
+  .sum-p{align-self:start}
+  .offer-m{display:block;margin-top:16px}
+
+  .members{padding:96px 0 0}
+  .members h2{margin:0 20px 20px}
+  .quotes{display:flex;gap:12px;width:max-content;padding:0 20px}
+  .q{flex:none;width:296px;min-height:260px;padding:24px;gap:18px;scroll-snap-align:start}
+
+  .journal{margin-top:96px;padding:64px 20px 72px}
+  .j-h{margin-bottom:24px}
+  .j-grid{grid-template-columns:minmax(0,1fr);gap:12px}
+  .feat-w{height:440px}
+  .feat-t{left:20px;right:20px;bottom:20px;gap:14px}
+  .feat-t>span{gap:4px}
+  .feat-n{font-size:20px;line-height:1.3;letter-spacing:-.01em}
+  .pill-cream{height:44px}
+  .j-list{display:flex;flex-direction:column;gap:12px}
+  .jc{flex-direction:row;align-items:flex-end;padding:20px}
+  .jc-t{gap:4px;padding-right:0}
+  .jc-n{font-size:15px;font-weight:500;line-height:1.4;letter-spacing:0}
+  .jc .rbtn{width:44px;height:44px}
+  .j-all{margin-top:12px;font-size:13px}
+
+  .faq{display:block;padding:96px 20px 72px}
+  .faq .sec-h{margin-bottom:20px}
+  .faq .sec-h .lnk{min-height:0}
+  details.acc summary{padding:16px 0}
+
+  .foot{margin:0 20px;padding:32px 0 88px;gap:24px}
+  .fcols{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:20px;column-gap:16px;font-size:15px}
+  .fcols>div{grid-column:auto;gap:0}
+  .fcols a{display:flex;align-items:center;min-height:44px}
+}
+@media (min-width:761px){.p-pm,.offer-m,.m-only{display:none!important}}
+@media (max-width:760px){.d-only{display:none!important}}
+</style>
+</head>
+<body>
+
+<p class="promo">Your first AED 299 is on us.<a class="lnk-c" href="#plans"><span class="u">See the plans</span></a></p>
+
+<header class="hdr" data-header>
+  <a class="logo" href="#top" aria-label="Iconec home"><svg viewBox="0 0 220 84.29" fill="currentColor" role="img" aria-label="Iconec"><path d="M2.039 82.958V10.407H0V9.074H10.749V10.407H8.71V82.958H10.749V84.291H0V82.958H2.039Z"></path><path d="M18.686 65.011V28.352C18.686 22.874 20.757 17.638 24.366 13.983C27.438 10.871 31.403 9.127 35.529 9.074H35.581C39.691 9.139 43.643 10.881 46.702 13.983C50.267 17.591 52.336 22.764 52.381 28.172V35.035H45.712V21.975C45.673 18.709 44.41 15.579 42.251 13.393C40.402 11.52 38.019 10.46 35.538 10.407C33.053 10.457 30.667 11.518 28.818 13.391C26.658 15.577 25.398 18.709 25.357 21.984V71.386C25.396 74.652 26.658 77.782 28.816 79.968C30.666 81.841 33.051 82.902 35.534 82.954C39.367 82.901 43.051 81.279 45.906 78.387C49.268 74.985 51.194 70.11 51.194 65.009V64.516H52.381V65.009C52.381 70.485 50.31 75.723 46.701 79.376C43.629 82.488 39.666 84.232 35.539 84.287H35.531L35.536 83.794L35.528 84.287C31.402 84.232 27.438 82.488 24.366 79.376C20.757 75.723 18.686 70.485 18.686 65.009V65.011Z"></path><path d="M107.554 9.074L133.984 80.292V14.861C133.889 13.653 133.399 12.533 132.601 11.706C131.793 10.868 130.743 10.407 129.642 10.407H129.202V9.074H137.208V10.407H135.17V84.291H128.696L102.266 13.073V78.501C102.361 79.71 102.851 80.83 103.649 81.657C104.457 82.495 105.507 82.956 106.608 82.956H107.048V84.289H99.042V82.956H101.08V10.407H99.042V9.074H107.554Z"></path><path d="M145.724 82.956V10.405H143.685V9.072H179.816V21.976H178.629V21.483C178.629 15.609 174.547 10.745 169.334 10.403H152.397V46.012H163.017C166.237 45.797 168.759 42.791 168.759 39.161V38.668H169.946V54.687H168.759V54.194C168.759 50.565 166.237 47.557 163.017 47.343H152.397V82.951H169.334C174.548 82.609 178.629 77.745 178.629 71.872V71.379H179.816V84.282H143.685V82.949H145.724V82.956Z"></path><path d="M186.303 65.011V28.352C186.303 22.874 188.374 17.638 191.984 13.983C195.055 10.871 199.02 9.127 203.147 9.074H203.199C207.308 9.139 211.26 10.881 214.32 13.983C217.884 17.591 219.953 22.764 219.998 28.172V35.035H213.329V21.975C213.29 18.709 212.028 15.579 209.868 13.393C208.021 11.52 205.636 10.46 203.155 10.407C200.67 10.457 198.284 11.518 196.433 13.391C194.274 15.577 193.013 18.709 192.973 21.984V71.386C193.011 74.652 194.274 77.782 196.433 79.968C198.283 81.841 200.669 82.902 203.152 82.954C206.984 82.901 210.668 81.279 213.523 78.387C216.885 74.985 218.811 70.11 218.811 65.009V64.516H219.998V65.009C219.998 70.485 217.928 75.723 214.318 79.376C211.246 82.488 207.283 84.232 203.157 84.287H203.148L203.152 83.794L203.143 84.287C199.017 84.232 195.054 82.488 191.982 79.376C188.372 75.723 186.302 70.485 186.302 65.009L186.303 65.011Z"></path><g transform="translate(58.82 0) scale(0.52775)"><path d="M36.942 17.629C40.341 13.429 47.362 5.086 47.362 5.086V1.976H45.192V4.162C45.192 4.162 34.594 17.251 34.591 17.254V19.989C38.343 20.638 41.949 22.506 44.805 25.397C48.897 29.54 51.286 35.471 51.362 41.66V135.269C51.289 141.474 48.897 147.408 44.805 151.551C41.297 155.103 36.773 157.114 32.065 157.209H31.938C27.23 157.114 22.706 155.103 19.198 151.551C15.107 147.408 12.717 141.477 12.641 135.288V41.675C12.714 35.471 15.107 29.536 19.198 25.393C22.188 22.366 26.067 20.46 30.016 19.904V17.264L19.373 4.159V1.973H17.203V5.083C17.203 5.083 24.294 13.416 27.69 17.585C21.692 18.503 16.295 21.264 11.618 25.676C11.329 25.95 11.046 26.226 10.764 26.512C3.924 33.438 0 43.362 0 53.742V123.203C0 133.582 3.924 143.504 10.764 150.429C16.584 156.326 24.094 159.63 31.919 159.735H32.011H32.09C39.906 159.63 47.416 156.326 53.236 150.429C60.076 143.507 64 133.582 64 123.206V53.742C64 43.362 60.076 33.441 53.236 26.515C48.541 21.759 43.111 18.693 36.945 17.629"></path><path d="M40.656 0.016H23.869L21.486 4.159L32.297 17.222L43.051 4.159L40.656 0.016ZM31.185 12.486L23.973 3.854L25.101 2.002H31.185V12.486ZM33.364 12.486V2.002H39.448L40.576 3.854L33.364 12.486Z"></path></g></svg></a>
+  <nav class="hnav" aria-label="Main">
+    <a href="#pieces">Pieces<svg aria-hidden="true" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.5L8 10l3.5-3.5"/></svg></a>
+    <a href="#plans">Membership<svg aria-hidden="true" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.5L8 10l3.5-3.5"/></svg></a>
+    <a href="#how">How it works<svg aria-hidden="true" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.5L8 10l3.5-3.5"/></svg></a>
+  </nav>
+  <div class="hr">
+    <div class="lg" role="group" aria-label="Language" data-lang>
+      <button class="lang" type="button" aria-pressed="true">EN</button>
+      <button class="lang" type="button" aria-pressed="false" lang="ar">ع</button>
+    </div>
+    <a class="signin" href="#signin">Sign in</a>
+    <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" data-menu-open><svg aria-hidden="true" width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M3 8h16"/><path d="M3 14h16"/></svg></button>
+  </div>
+</header>
+
+<div data-menu role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="m-top">
+    <a class="logo" href="#top" aria-label="Iconec home"><svg viewBox="0 0 220 84.29" fill="currentColor" role="img" aria-label="Iconec"><path d="M2.039 82.958V10.407H0V9.074H10.749V10.407H8.71V82.958H10.749V84.291H0V82.958H2.039Z"></path><path d="M18.686 65.011V28.352C18.686 22.874 20.757 17.638 24.366 13.983C27.438 10.871 31.403 9.127 35.529 9.074H35.581C39.691 9.139 43.643 10.881 46.702 13.983C50.267 17.591 52.336 22.764 52.381 28.172V35.035H45.712V21.975C45.673 18.709 44.41 15.579 42.251 13.393C40.402 11.52 38.019 10.46 35.538 10.407C33.053 10.457 30.667 11.518 28.818 13.391C26.658 15.577 25.398 18.709 25.357 21.984V71.386C25.396 74.652 26.658 77.782 28.816 79.968C30.666 81.841 33.051 82.902 35.534 82.954C39.367 82.901 43.051 81.279 45.906 78.387C49.268 74.985 51.194 70.11 51.194 65.009V64.516H52.381V65.009C52.381 70.485 50.31 75.723 46.701 79.376C43.629 82.488 39.666 84.232 35.539 84.287H35.531L35.536 83.794L35.528 84.287C31.402 84.232 27.438 82.488 24.366 79.376C20.757 75.723 18.686 70.485 18.686 65.009V65.011Z"></path><path d="M107.554 9.074L133.984 80.292V14.861C133.889 13.653 133.399 12.533 132.601 11.706C131.793 10.868 130.743 10.407 129.642 10.407H129.202V9.074H137.208V10.407H135.17V84.291H128.696L102.266 13.073V78.501C102.361 79.71 102.851 80.83 103.649 81.657C104.457 82.495 105.507 82.956 106.608 82.956H107.048V84.289H99.042V82.956H101.08V10.407H99.042V9.074H107.554Z"></path><path d="M145.724 82.956V10.405H143.685V9.072H179.816V21.976H178.629V21.483C178.629 15.609 174.547 10.745 169.334 10.403H152.397V46.012H163.017C166.237 45.797 168.759 42.791 168.759 39.161V38.668H169.946V54.687H168.759V54.194C168.759 50.565 166.237 47.557 163.017 47.343H152.397V82.951H169.334C174.548 82.609 178.629 77.745 178.629 71.872V71.379H179.816V84.282H143.685V82.949H145.724V82.956Z"></path><path d="M186.303 65.011V28.352C186.303 22.874 188.374 17.638 191.984 13.983C195.055 10.871 199.02 9.127 203.147 9.074H203.199C207.308 9.139 211.26 10.881 214.32 13.983C217.884 17.591 219.953 22.764 219.998 28.172V35.035H213.329V21.975C213.29 18.709 212.028 15.579 209.868 13.393C208.021 11.52 205.636 10.46 203.155 10.407C200.67 10.457 198.284 11.518 196.433 13.391C194.274 15.577 193.013 18.709 192.973 21.984V71.386C193.011 74.652 194.274 77.782 196.433 79.968C198.283 81.841 200.669 82.902 203.152 82.954C206.984 82.901 210.668 81.279 213.523 78.387C216.885 74.985 218.811 70.11 218.811 65.009V64.516H219.998V65.009C219.998 70.485 217.928 75.723 214.318 79.376C211.246 82.488 207.283 84.232 203.157 84.287H203.148L203.152 83.794L203.143 84.287C199.017 84.232 195.054 82.488 191.982 79.376C188.372 75.723 186.302 70.485 186.302 65.009L186.303 65.011Z"></path><g transform="translate(58.82 0) scale(0.52775)"><path d="M36.942 17.629C40.341 13.429 47.362 5.086 47.362 5.086V1.976H45.192V4.162C45.192 4.162 34.594 17.251 34.591 17.254V19.989C38.343 20.638 41.949 22.506 44.805 25.397C48.897 29.54 51.286 35.471 51.362 41.66V135.269C51.289 141.474 48.897 147.408 44.805 151.551C41.297 155.103 36.773 157.114 32.065 157.209H31.938C27.23 157.114 22.706 155.103 19.198 151.551C15.107 147.408 12.717 141.477 12.641 135.288V41.675C12.714 35.471 15.107 29.536 19.198 25.393C22.188 22.366 26.067 20.46 30.016 19.904V17.264L19.373 4.159V1.973H17.203V5.083C17.203 5.083 24.294 13.416 27.69 17.585C21.692 18.503 16.295 21.264 11.618 25.676C11.329 25.95 11.046 26.226 10.764 26.512C3.924 33.438 0 43.362 0 53.742V123.203C0 133.582 3.924 143.504 10.764 150.429C16.584 156.326 24.094 159.63 31.919 159.735H32.011H32.09C39.906 159.63 47.416 156.326 53.236 150.429C60.076 143.507 64 133.582 64 123.206V53.742C64 43.362 60.076 33.441 53.236 26.515C48.541 21.759 43.111 18.693 36.945 17.629"></path><path d="M40.656 0.016H23.869L21.486 4.159L32.297 17.222L43.051 4.159L40.656 0.016ZM31.185 12.486L23.973 3.854L25.101 2.002H31.185V12.486ZM33.364 12.486V2.002H39.448L40.576 3.854L33.364 12.486Z"></path></g></svg></a>
+    <button class="m-close" type="button" aria-label="Close menu" data-menu-close><svg aria-hidden="true" width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M5 5l12 12"/><path d="M17 5L5 17"/></svg></button>
+  </div>
+  <nav class="m-links" aria-label="Menu">
+    <a href="#pieces">Pieces</a>
+    <a href="#plans">Membership</a>
+    <a href="#how">How it works</a>
+    <a href="#faq">Questions</a>
+    <a href="#signin">Sign in</a>
+  </nav>
+  <a class="btn" href="#plans">Become a member</a>
+</div>
+
+<main>
+<section id="top" class="hero" data-hero>
+  <div class="hero-copy">
+    <h1 class="t56"><span class="h-line"><span>Real diamonds,</span></span><span class="h-line"><span>worn every day.</span></span></h1>
+    <p class="lede" data-hero-fade style="--d:450ms">Hold up to three pieces of 18k gold with IGI-certified diamonds. Swap them. Never buy.</p>
+    <div class="hero-cta" data-hero-fade style="--d:500ms"><a class="btn" href="#plans">Become a member</a></div>
+  </div>
+  <div class="hero-img"><img class="kb" src="ring.jpg" width="501" height="900" alt="The Ivy, an 18k gold ring with diamonds, on dark slate" decoding="async" fetchpriority="high"></div>
+</section>
+
+<section id="how" class="how">
+  <h2 class="t56" data-reveal>Hold up to three.<br>Swap from day 2.</h2>
+  <p data-reveal style="--d:50ms">Choose a plan, pick your pieces, set a delivery. Pieces are due back by day 30, or extend by 30 days.</p>
+  <div class="pills" data-reveal style="--d:100ms"><a class="pill-ink press" href="#faq">How it works</a><a class="pill-ink press" href="#plans">See the plans</a></div>
+</section>
+
+<section id="pieces" class="pieces" aria-labelledby="pieces-h">
+  <div class="sec-h" data-reveal><h2 id="pieces-h" class="t32">Pieces to rotate through</h2><p>Every piece is 18k gold with IGI-certified diamonds.</p></div>
+  <div class="rail-vp">
+    <ul class="track" aria-label="Pieces" data-stagger="50">
+      <li data-reveal><div class="pc">
+        <a class="zoom ring" href="#piece"><img src="ring.jpg" width="501" height="900" alt="The Ivy, an 18k gold ring with diamonds, on dark slate" decoding="async" loading="lazy"><span class="scrim"></span><span class="pc-t"><span class="pc-n">The Ivy</span><span class="pc-v num">Retail value AED 00,000</span></span></a>
+        <span class="chip"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="10" r="4.5"/><path d="M6.2 3.2h3.6L8 5.4z"/></svg>Ring</span>
+        <button class="qbtn press" type="button" aria-label="Quick look: The Ivy"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10"/><path d="M3 8h10"/></svg></button>
+      </div></li>
+      <li data-reveal><div class="pc">
+        <a class="zoom" href="#piece"><img src="riviere.jpg" width="724" height="900" alt="The Windfall, a two-row diamond necklace in 18k gold, on dark slate" decoding="async" loading="lazy"><span class="scrim"></span><span class="pc-t"><span class="pc-n">The Windfall</span><span class="pc-v num">Retail value AED 00,000</span></span></a>
+        <span class="chip"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 2.5c0 4.6 2.5 8 5.5 8s5.5-3.4 5.5-8"/><path d="M8 10.5v1.2"/><path d="M8 11.7l-1.3 1.6L8 14.8l1.3-1.5z"/></svg>Necklace</span>
+        <button class="qbtn press" type="button" aria-label="Quick look: The Windfall"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10"/><path d="M3 8h10"/></svg></button>
+      </div></li>
+      <li data-reveal><div class="pc">
+        <a class="zoom" href="#piece"><img src="shot-earrings.jpg" width="965" height="1200" alt="Diamond drop earrings in 18k gold on dark slate" decoding="async" loading="lazy"><span class="scrim"></span><span class="pc-t"><span class="pc-n">Piece name</span><span class="pc-v num">Retail value AED 00,000</span></span></a>
+        <span class="chip"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M5 2v3"/><path d="M11 2v3"/><path d="M5 5c-1.4 2.2-1.6 4.2 0 6.5 1.6-2.3 1.4-4.3 0-6.5z"/><path d="M11 5c-1.4 2.2-1.6 4.2 0 6.5 1.6-2.3 1.4-4.3 0-6.5z"/></svg>Earrings</span>
+        <button class="qbtn press" type="button" aria-label="Quick look: earrings"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10"/><path d="M3 8h10"/></svg></button>
+      </div></li>
+      <li data-reveal><div class="pc">
+        <a class="zoom" href="#piece"><img src="pendant.jpg" width="724" height="900" alt="A diamond leaf pendant in 18k gold with a red drop, on dark slate" decoding="async" loading="lazy"><span class="scrim"></span><span class="pc-t"><span class="pc-n">Piece name</span><span class="pc-v num">Retail value AED 00,000</span></span></a>
+        <span class="chip"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5v3"/><path d="M8 4.5c-2.6 1.8-3.4 4.6-2.2 7.4 1.2 1.6 3.2 1.6 4.4 0 1.2-2.8.4-5.6-2.2-7.4z"/><path d="M8 7v6"/></svg>Pendant</span>
+        <button class="qbtn press" type="button" aria-label="Quick look: pendant"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10"/><path d="M3 8h10"/></svg></button>
+      </div></li>
+    </ul>
+  </div>
+  <div class="rail-foot" data-reveal="fade">
+    <a class="lnk" href="#all"><span class="u">See all pieces</span></a>
+    <div class="arrows">
+      <button class="rbtn press" type="button" aria-label="Previous pieces" aria-disabled="true" data-rail="-1"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M13 8H3"/><path d="M7 4L3 8l4 4"/></svg></button>
+      <button class="rbtn press on" type="button" aria-label="Next pieces" data-rail="1"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10"/><path d="M9 4l4 4-4 4"/></svg></button>
+    </div>
+  </div>
+</section>
+
+<section id="plans" class="plans-sec" aria-labelledby="plans-h">
+  <div class="plans-h" data-reveal>
+    <div class="sec-h"><h2 id="plans-h" class="t32">Choose how many you hold</h2><p>Change your pieces from day 2. Never buy.</p></div>
+    <p class="offer d-only">Your first AED 299 is on us.</p>
+  </div>
+  <ul class="plans num" role="radiogroup" aria-label="Pieces at a time" data-stagger="50">
+    <li data-reveal><div class="plan press" data-plan="0">
+      <button class="pick" type="button" role="radio" aria-checked="false" tabindex="-1">
+        <span class="p-head"><span class="p-n">1 piece</span><span class="p-pm"><b>AED 299</b><span>a month</span></span><span class="p-d">One piece at a time. Swap it from day 2.</span></span>
+        <span class="p-p"><b>AED 299</b><span>a month</span></span>
+      </button>
+      <div class="cta"><span class="btn-o ghost" aria-hidden="true">Choose 1 piece</span><a class="btn" href="#plans" tabindex="-1">Become a member</a></div>
+    </div></li>
+    <li data-reveal><div class="plan press on" data-plan="1">
+      <button class="pick" type="button" role="radio" aria-checked="true" tabindex="0">
+        <span class="p-head"><span class="p-n">2 pieces</span><span class="p-pm"><b>AED 450</b><span>a month</span></span><span class="p-d">Two at a time, worn together or apart.</span></span>
+        <span class="p-p"><b>AED 450</b><span>a month</span></span>
+      </button>
+      <div class="cta"><span class="btn-o ghost" aria-hidden="true">Choose 2 pieces</span><a class="btn" href="#plans">Become a member</a></div>
+    </div></li>
+    <li data-reveal><div class="plan press" data-plan="2">
+      <button class="pick" type="button" role="radio" aria-checked="false" tabindex="-1">
+        <span class="p-head"><span class="p-n">3 pieces</span><span class="p-pm"><b>AED 599</b><span>a month</span></span><span class="p-d">Three at a time. The most to rotate.</span></span>
+        <span class="p-p"><b>AED 599</b><span>a month</span></span>
+      </button>
+      <div class="cta"><span class="btn-o ghost" aria-hidden="true">Choose 3 pieces</span><a class="btn" href="#plans" tabindex="-1">Become a member</a></div>
+    </div></li>
+  </ul>
+  <div class="sum-rule" data-reveal="rule"></div>
+  <div class="sum num" data-reveal="fade" aria-live="polite">
+    <span class="slots" aria-hidden="true">
+        <span class="slot ring full" style="--i:0"><img src="ring.jpg" width="501" height="900" alt="" decoding="async" loading="lazy"></span>
+        <span class="slot full" style="--i:1"><img src="riviere.jpg" width="724" height="900" alt="" decoding="async" loading="lazy"></span>
+        <span class="slot" style="--i:2"><img src="shot-earrings.jpg" width="965" height="1200" alt="" decoding="async" loading="lazy"></span>
+      </span>
+    <span class="sum-c"><span id="sum-n">2</span> <span id="sum-w">pieces</span> at a time</span>
+    <p class="sum-p"><b id="sum-p">AED 450</b><span>a month</span></p>
+  </div>
+  <p class="offer offer-m">Your first AED 299 is on us.</p>
+</section>
+
+<section id="members" class="members" aria-labelledby="members-h">
+  <h2 id="members-h" class="t32" data-reveal>In members' words</h2>
+  <div class="q-vp">
+    <ul class="quotes" data-stagger="50">
+      <li data-reveal><div class="q"><span class="chip-q">Membership</span><blockquote>[Member quote placeholder]</blockquote><div class="who"><span class="av" aria-hidden="true"></span><span>[Name placeholder]</span></div></div></li>
+      <li data-reveal><div class="q"><span class="chip-q">Swapping</span><blockquote>[Member quote placeholder]</blockquote><div class="who"><span class="av" aria-hidden="true"></span><span>[Name placeholder]</span></div></div></li>
+      <li data-reveal><div class="q"><span class="chip-q">Gifting</span><blockquote>[Member quote placeholder]</blockquote><div class="who"><span class="av" aria-hidden="true"></span><span>[Name placeholder]</span></div></div></li>
+    </ul>
+  </div>
+</section>
+
+<section id="journal" class="journal" aria-labelledby="journal-h">
+  <div class="j-h" data-reveal>
+    <div class="sec-h"><h2 id="journal-h" class="t32">From the journal</h2><p>[Journal intro placeholder]</p></div>
+    <a class="lnk lnk-c d-only" href="#journal-all"><span class="u">All stories</span></a>
+  </div>
+  <div class="j-grid">
+    <div class="feat-w" data-reveal="img">
+      <a class="feat press" href="#story">
+        <span class="par" data-parallax="0.06"><img src="riviere.jpg" width="724" height="900" alt="The Windfall necklace on dark slate" decoding="async" loading="lazy"></span>
+        <span class="scrim"></span>
+        <span class="feat-t"><span><span class="feat-n">[Featured story title placeholder]</span><span class="meta-w">[Date placeholder] · [Read time placeholder]</span></span><span class="pill-cream">Read more</span></span>
+      </a>
+    </div>
+    <ul class="j-list" data-stagger="50">
+      <li data-reveal><a class="jc press" href="#story"><span class="jc-t"><span class="jc-n">[Story title placeholder]</span><span class="jc-m">[Date placeholder] · [Topic placeholder]</span></span><span class="rbtn" aria-hidden="true"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11l6-6"/><path d="M6 5h5v5"/></svg></span></a></li>
+      <li data-reveal><a class="jc press" href="#story"><span class="jc-t"><span class="jc-n">[Story title placeholder]</span><span class="jc-m">[Date placeholder] · [Topic placeholder]</span></span><span class="rbtn" aria-hidden="true"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11l6-6"/><path d="M6 5h5v5"/></svg></span></a></li>
+      <li data-reveal><a class="jc press" href="#story"><span class="jc-t"><span class="jc-n">[Story title placeholder]</span><span class="jc-m">[Date placeholder] · [Topic placeholder]</span></span><span class="rbtn" aria-hidden="true"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11l6-6"/><path d="M6 5h5v5"/></svg></span></a></li>
+    </ul>
+  </div>
+  <a class="lnk lnk-c j-all m-only" href="#journal-all"><span class="u">All stories</span></a>
+</section>
+
+<section id="faq" class="faq" aria-labelledby="faq-h">
+  <div class="sec-h" data-reveal><h2 id="faq-h" class="t32">Questions</h2><p>Can't find yours? <a class="lnk" href="#contact"><span class="u">Contact us</span></a></p></div>
+  <div class="faq-list" data-stagger="50">
+    <div class="ink-rule" data-reveal="rule"></div>
+    <details class="acc" open data-reveal><summary>Who can become a member?<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 8h12"/><path class="plus-v" d="M8 2v12"/></svg></summary><div class="acc-body"><p>Anyone can join on the website. Choose a plan, pick your pieces and set a delivery. There is no waitlist and no approval.</p></div></details>
+    <details class="acc" data-reveal><summary>Do I ever have to buy a piece?<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 8h12"/><path class="plus-v" d="M8 2v12"/></svg></summary><div class="acc-body"><p>No. You hold, wear and swap. Nothing to buy.</p></div></details>
+    <details class="acc" data-reveal><summary>What happens on day 30?<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 8h12"/><path class="plus-v" d="M8 2v12"/></svg></summary><div class="acc-body"><p>Pieces are due back by day 30. You can extend any piece by 30 days.</p></div></details>
+    <details class="acc" data-reveal><summary>What if a piece is lost or damaged?<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 8h12"/><path class="plus-v" d="M8 2v12"/></svg></summary><div class="acc-body"><p>[Answer placeholder: cover, deposit and what happens next.]</p></div></details>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="fcols" data-stagger="50">
+    <div data-reveal><p>Pieces</p><a href="#r">Rings</a><a href="#n">Necklaces</a><a href="#e">Earrings</a></div>
+    <div data-reveal><p>Membership</p><a href="#how">How it works</a><a href="#plans">Plans</a><a href="#gift">Gifting</a></div>
+    <div data-reveal><p>Help</p><a href="#faq">Questions</a><a href="#contact">Contact</a><a href="#delivery"><span class="d-only">Delivery and returns</span><span class="m-only">Delivery</span></a></div>
+    <div data-reveal><p>Iconec</p><a href="#story">Our story</a><a href="#journal">Journal</a><a href="#ig">Instagram</a></div>
+  </div>
+  <div class="fbot"><span>English · العربية<span class="m-only"> · UAE</span></span><div class="fbot-r"><span class="d-only">UAE · AED</span><span>© 2026 Iconec</span></div></div>
+</footer>
+
+<script src="motion.js"></script>
+<script>
+/* Signature: choosing how many you hold. The selected card takes the ink ring and the green "Become a member"
+   (crossfade 240ms in / 200ms out); the slots below fill with the pieces you'd hold (spring pop, 40ms apart,
+   empties leave in 160ms ease-in) and the count and price tween with countTo (280ms). */
+(function () {
+  var PLANS = [{ n: 1, price: 299 }, { n: 2, price: 450 }, { n: 3, price: 599 }];
+  var cards = [].slice.call(document.querySelectorAll('.plan[data-plan]'));
+  var picks = cards.map(function (c) { return c.querySelector('.pick'); });
+  var slots = [].slice.call(document.querySelectorAll('.slot'));
+  var sumN = document.getElementById('sum-n'), sumW = document.getElementById('sum-w'), sumP = document.getElementById('sum-p');
+  if (!cards.length) return;
+  var cur = 1;
+  function set(i, focus) {
+    if (i === cur) { if (focus) picks[i].focus(); return; }
+    cur = i;
+    var p = PLANS[i];
+    cards.forEach(function (c, k) {
+      var on = k === i;
+      c.classList.toggle('on', on);
+      picks[k].setAttribute('aria-checked', on ? 'true' : 'false');
+      picks[k].tabIndex = on ? 0 : -1;
+      c.querySelector('.cta .btn').tabIndex = on ? 0 : -1;
+    });
+    if (focus) picks[i].focus();
+    slots.forEach(function (s, k) { s.classList.toggle('full', k < p.n); });
+    window.countTo(sumN, p.n);
+    sumW.textContent = p.n === 1 ? 'piece' : 'pieces';
+    window.countTo(sumP, p.price, 'AED ');
+  }
+  picks.forEach(function (b, i) {
+    b.addEventListener('click', function () { set(i); });
+    b.addEventListener('keydown', function (e) {
+      var d = (e.key === 'ArrowRight' || e.key === 'ArrowDown') ? 1 : (e.key === 'ArrowLeft' || e.key === 'ArrowUp') ? -1 : 0;
+      if (!d) return;
+      e.preventDefault();
+      set((cur + d + picks.length) % picks.length, true);
+    });
+  });
+})();
+
+/* Pieces rail (desktop): the arrows slide the row one card at a time (300ms ease-out, transform only);
+   the arrow with somewhere to go is filled ink. On phones the row is a native swipe rail. */
+(function () {
+  var vp = document.querySelector('.rail-vp'), track = document.querySelector('.track');
+  var btns = [].slice.call(document.querySelectorAll('[data-rail]'));
+  if (!vp || !track || !btns.length) return;
+  var mq = window.matchMedia('(max-width: 760px)');
+  var x = 0;
+  function bounds() { var li = track.querySelector('li'); return { max: Math.max(0, track.offsetWidth - vp.clientWidth), step: li ? li.offsetWidth + 16 : 356 }; }
+  function paint(max) {
+    btns.forEach(function (b) {
+      var d = +b.getAttribute('data-rail'), can = d < 0 ? x > 0 : x < max;
+      b.classList.toggle('on', can);
+      b.setAttribute('aria-disabled', can ? 'false' : 'true');
+    });
+  }
+  function go(d) {
+    if (mq.matches) return;
+    var m = bounds(); /* reads first */
+    x = Math.min(m.max, Math.max(0, x + d * m.step));
+    track.style.transform = 'translate3d(' + (-x) + 'px,0,0)'; /* then writes */
+    paint(m.max);
+  }
+  btns.forEach(function (b) { b.addEventListener('click', function () { go(+b.getAttribute('data-rail')); }); });
+  function reset() { var m = bounds(); x = Math.min(x, m.max); if (mq.matches) x = 0; track.style.transform = x ? 'translate3d(' + (-x) + 'px,0,0)' : ''; paint(m.max); }
+  window.addEventListener('resize', reset);
+  reset();
+})();
+</script>
+</body>
+</html>

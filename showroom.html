@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>(function(d){var h=d.documentElement;h.classList.add("js");var s=/[?&]still\b/.test(location.search);if(s)h.classList.add("still");if(s||(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches))h.classList.add("rm");})(document)</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Showroom · Iconec motion prototype</title>
+<meta name="iconec-index" content="index.html">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500&display=swap">
+<link rel="stylesheet" href="base.css">
+<style>
+/* The Showroom: warm off-white, tiny uppercase nav, a statement paragraph as the opening, tight 16px gutters */
+:root{
+  --bg:#F6F5F1;
+  --sub2:#565B53;
+  --hair:rgba(20,26,20,.14);
+  --slate:#2A2B2D;
+  --gutter:16px;
+  --sec:120px;
+}
+body{background:var(--bg);color:var(--ink)}
+.t{font-size:13px;line-height:1.4;text-transform:uppercase;letter-spacing:.04em}
+.sub{color:var(--sub2)}
+.g12{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:16px}
+.px16{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.sec{padding-top:var(--sec)}
+.m-only{display:none}
+.big{font-size:32px;line-height:1.25;letter-spacing:-.02em}
+
+/* header */
+.hd{height:64px;align-items:center;background:var(--bg)}
+[data-header].hd{background:rgba(246,245,241,0)}
+[data-header].hd.scrolled{background:rgba(246,245,241,.97);color:var(--ink)}
+.logo{grid-column:span 3;justify-self:start;display:flex;align-items:center;min-height:44px}
+.nav{grid-column:span 5;display:flex;gap:28px}
+.nav a,.hd-signin{transition:color var(--t-ui) var(--ease-out)}
+.nav a:hover,.hd-signin:hover{color:var(--green)}
+.hd-r{grid-column:span 4;display:flex;align-items:center;justify-content:flex-end;gap:22px}
+.langs{display:flex;gap:2px}
+.lang{height:32px;min-width:32px;padding:0 6px;font-size:13px;opacity:1;color:var(--sub2);font-family:"Overused Grotesk","Noto Kufi Arabic",sans-serif}
+.lang[aria-pressed="true"]{color:var(--ink);text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+.hd .btn{min-height:36px;height:36px;padding:0 16px;font-size:13px;text-transform:none;letter-spacing:0}
+.menu-b{display:none;width:44px;height:44px;align-items:center;justify-content:center}
+
+/* menu sheet */
+[data-menu]{background:var(--bg)}
+.sheet-top{height:56px;margin:-16px -12px 8px 0;display:flex;align-items:center;justify-content:space-between}
+.close-b{width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+[data-menu] .m-links a{border-bottom-color:var(--hair)}
+[data-menu] .btn{margin-top:auto;width:100%}
+
+/* 1 · statement + inset photo */
+.hero{padding-top:56px}
+.stmt{font-size:32px;line-height:1.25;letter-spacing:-.02em;max-width:30em;text-wrap:pretty}
+.stmt .h-line>span{white-space:nowrap}
+.hl{position:relative;white-space:nowrap}
+.hl::after{content:"";position:absolute;left:0;right:0;bottom:.02em;height:1px;background:currentColor;opacity:.45;transform-origin:0 50%;transition:transform var(--t-ui) var(--ease-out)}
+.hl:hover::after{transform:scaleX(0);transform-origin:100% 50%;transition:transform var(--t-ui-exit) var(--ease-in)}
+.hero-fig{margin-top:48px;display:flex;flex-direction:column;gap:12px}
+.hero-ph{height:clamp(448px,53vw,760px);overflow:hidden}
+.hm{display:block;height:100%;overflow:hidden;background:#3A3540}
+.hi{width:100%;height:100%;object-fit:cover;object-position:50% 55%}
+.hero-cap .c1{grid-column:span 6}
+.hero-cap .c2{grid-column:span 6;justify-self:start;text-transform:none;letter-spacing:0}
+/* load sequence: lines rise 50ms apart → underline draws → photo unmasks and settles → caption fades */
+html.js:not(.rm) .stmt:not(.split){opacity:0}
+html.js [data-hero] .stmt .h-line>span{transform:translate3d(0,105%,0);transition:transform 1s var(--ease-out) calc(var(--i,0) * 50ms + 150ms)}
+html.js [data-hero].go .stmt .h-line>span{transform:none}
+html.js .hero:not(.settled) .hl::after{transform:scaleX(0)}
+html.js .hero.go:not(.settled) .hl::after{transform:scaleX(1);transition:transform .6s var(--ease-out) calc(var(--n,3) * 50ms + 450ms)}
+html.js .hero .hm{transform:translate3d(0,101%,0);transition:transform var(--t-img) var(--ease-out) calc(var(--n,3) * 50ms + 600ms)}
+html.js .hero .hi{transform:translate3d(0,-101%,0) scale(1.08);transition:transform calc(var(--t-img) + .2s) var(--ease-out) calc(var(--n,3) * 50ms + 600ms)}
+html.js .hero.go .hm,html.js .hero.go .hi{transform:none}
+html.js .hero:not(.settled) .hm,html.js .hero:not(.settled) .hi{will-change:transform}
+html.js .hero .hero-cap{opacity:0;transition:opacity .7s var(--ease-out) calc(var(--n,3) * 50ms + 1100ms)}
+html.js .hero.go .hero-cap{opacity:1}
+
+/* 2 · Windfall two-up with the slideshow */
+.mem{align-items:end}
+.ss{grid-column:1/span 7}
+.ss-frame{position:relative;aspect-ratio:1/1;touch-action:pan-y}
+.ss-frame .rv-mask,.ph .rv-mask{background:var(--slate)}
+.ss-stage{display:block;position:relative;height:100%}
+.ss-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.02);transition:opacity 160ms var(--ease-in),transform 0s 160ms}
+.ss-img.on{opacity:1;transform:none;z-index:1;transition:opacity 260ms var(--ease-out),transform 260ms var(--ease-out)}
+.ss-img.ivy{object-position:50% 18%}
+.ss-ctl{position:absolute;left:14px;bottom:14px;z-index:2;display:flex;align-items:center;gap:6px}
+.pg{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:#fff;color:var(--ink)}
+button.pg:hover{background:#ECEBE6}
+.cnt{width:auto;padding:0 12px;font-size:13px;gap:0}
+.roll{display:inline-grid;height:18px;line-height:18px;overflow:hidden}
+.roll>span{grid-area:1/1;display:block}
+html.js .ss-frame .ss-stage{transform:translate3d(0,-101%,0) scale(1.08);transition:transform calc(var(--t-img) + .2s) var(--ease-out) var(--d,0ms)}
+html.js .ss-frame.in .ss-stage{transform:none}
+html.js .ss-frame:not(.done) .ss-stage{will-change:transform}
+html.js .ss-frame .ss-ctl{opacity:0;transition:opacity .5s var(--ease-out) .7s}
+html.js .ss-frame.in .ss-ctl{opacity:1}
+.mem-tx{grid-column:9/span 4;display:flex;flex-direction:column;gap:32px;padding-bottom:4px}
+.mem-h{font-size:20px;line-height:1.4;letter-spacing:-.01em;text-wrap:pretty}
+.plans{border-top:1px solid var(--hair)}
+.plans li{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--hair)}
+.ctas{display:flex;gap:10px;flex-wrap:wrap}
+
+/* 3 · pieces this month */
+.p-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px}
+.p-head .u{font-size:13px}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.card{display:flex;flex-direction:column;gap:12px}
+.ph{display:block;position:relative;aspect-ratio:4/5}
+.ph img{width:100%;height:100%;object-fit:cover}
+.ph img.ivy{object-position:50% 10%}
+.chip{position:absolute;left:14px;top:14px;z-index:2;height:24px;padding:0 10px;display:inline-flex;align-items:center;border-radius:999px;background:#fff;color:var(--ink);font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+.meta{display:flex;flex-direction:column;gap:2px;font-size:13px}
+.meta .nm{font-size:16px}
+/* hover zoom uses the scale property so it never fights the reveal's transform */
+.card .ph img{scale:1}
+html.js .card [data-reveal="img"] .rv-mask>img{transition:transform calc(var(--t-img) + .2s) var(--ease-out) var(--d,0ms),scale var(--t-ui-exit) var(--ease-in) 0ms}
+@media (hover:hover){
+  .card:hover .ph img{scale:1.03}
+  html.js .card:hover [data-reveal="img"] .rv-mask>img{transition:transform calc(var(--t-img) + .2s) var(--ease-out) var(--d,0ms),scale var(--t-ui) var(--ease-out) 0ms}
+}
+html.js .card .chip{opacity:0;transition:opacity .5s var(--ease-out) calc(var(--i,0) * 50ms + 650ms)}
+html.js .card .ph.in .chip{opacity:1}
+html.js .card .meta{opacity:0;transform:translate3d(0,10px,0);transition:opacity .7s var(--ease-out) calc(var(--i,0) * 50ms + 300ms),transform .8s var(--ease-out) calc(var(--i,0) * 50ms + 300ms)}
+html.js .card .ph.in + .meta{opacity:1;transform:none}
+
+/* 4 · joining sentence beside the pendant */
+.how{align-items:start}
+.how-tx{grid-column:1/span 6;display:flex;flex-direction:column;gap:24px}
+.how-tx .big{max-width:18em;text-wrap:pretty}
+.how-tx .u{align-self:flex-start}
+.how-fig{grid-column:8/span 5;display:flex;flex-direction:column;gap:12px}
+.how-ph{aspect-ratio:577/600}
+.px{display:block;height:100%;overflow:hidden}
+.px img{width:100%;height:100%;object-fit:cover}
+html.js .how-ph .px{transform:translate3d(0,-101%,0) scale(1.08);transition:transform calc(var(--t-img) + .2s) var(--ease-out) var(--d,0ms)}
+html.js .how-ph.in .px{transform:none}
+.how-fig figcaption{display:flex;justify-content:space-between;gap:16px}
+
+/* 5 · from the journal */
+.jn h2{margin-bottom:16px}
+.jlist{position:relative}
+.jl{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:24px;padding:22px 0}
+.jrule,.jend{display:block;height:1px;background:var(--hair)}
+.jrule{position:absolute;left:0;right:0;top:0}
+.jt{display:block;overflow:hidden;font-size:32px;letter-spacing:-.02em;line-height:1.2;padding-bottom:.08em;margin-bottom:-.08em;transform-origin:0 50%;transition:transform var(--t-ui-exit) var(--ease-in),color var(--t-ui-exit) var(--ease-in)}
+.jt-in{display:block}
+.ja{display:block}
+.ja svg{display:block;transition:transform var(--t-ui-exit) var(--ease-in)}
+@media (hover:hover){
+  .jl:hover .jt{transform:translate3d(6px,0,0);color:var(--green);transition:transform var(--t-ui) var(--ease-out),color var(--t-ui) var(--ease-out)}
+  .jl:hover .ja svg{transform:translate3d(4px,0,0);transition:transform var(--t-ui) var(--ease-out)}
+}
+.jl:active .jt{transform:translate3d(6px,0,0) scale(.98);transition:transform var(--t-press) var(--ease-out)}
+html.js .jrow[data-reveal]{opacity:1;transform:none}
+html.js .jrow .jrule{transform:scaleX(0);transform-origin:0 50%;transition:transform .9s var(--ease-out) calc(var(--i,0) * 50ms)}
+html.js .jrow .jt-in{transform:translate3d(0,105%,0);transition:transform .9s var(--ease-out) calc(var(--i,0) * 50ms + 250ms)}
+html.js .jrow .ja{opacity:0;transition:opacity .6s var(--ease-out) calc(var(--i,0) * 50ms + 400ms)}
+html.js .jrow.in .jrule,html.js .jrow.in .jt-in{transform:none}
+html.js .jrow.in .ja{opacity:1}
+
+/* 6 · questions */
+.faq{padding-bottom:var(--sec)}
+.faq>h2{grid-column:1/span 3}
+.faq-l{grid-column:5/span 8;border-top:1px solid var(--hair)}
+.acc{border-bottom:1px solid var(--hair)}
+.acc summary{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 0;font-size:20px;letter-spacing:-.01em;line-height:1.4}
+.acc summary .q{transform-origin:0 50%;transition:transform var(--t-press) var(--ease-out),color var(--t-ui) var(--ease-out)}
+.acc summary:hover .q{color:var(--green)}
+.acc summary:active .q{transform:scale(.98)}
+.acc summary svg{flex:none}
+.acc-body p{padding:0 0 20px;max-width:38em}
+
+/* 7 · ink footer */
+.ft{background:#141A14;color:#E6E7E3;padding-top:64px;padding-bottom:32px;display:flex;flex-direction:column;gap:96px}
+.ft a{transition:color var(--t-ui) var(--ease-out)}
+.ft a:hover{color:#fff}
+.ft-top{align-items:start}
+.ft-st{grid-column:1/span 6;display:flex;flex-direction:column;gap:28px;align-items:flex-start}
+.ft-st .big{color:#fff;max-width:16em}
+.btn-w{background:#fff;color:var(--green)}
+.btn-w:hover{background:#ECEBE6}
+.ft a.btn-w,.ft a.btn-w:hover{color:var(--green)}
+.fc{display:flex;flex-direction:column;gap:8px}
+.fc p{color:#A9ADA6}
+.fc1{grid-column:8/span 2}.fc2{grid-column:10/span 2}.fc3{grid-column:12/span 1}
+.ft-b{display:flex;flex-direction:column;gap:20px}
+.ft-rule{display:block;height:1px;background:rgba(255,255,255,.14)}
+.ft-bot{display:flex;justify-content:space-between;align-items:center;gap:16px;color:#A9ADA6}
+.ft-bot svg{color:#fff}
+
+/* reduced motion and still screenshots: final states */
+html.rm .stmt,html.rm .hero .hm,html.rm .hero .hi,html.rm .hero .hero-cap,html.rm .ss-stage,html.rm .ss-ctl,html.rm .px,html.rm .card .chip,html.rm .card .meta,html.rm .jrule,html.rm .jt-in,html.rm .ja,html.rm .hl::after{opacity:1!important;transform:none!important}
+
+/* tablet */
+@media (max-width:1100px){
+  .nav{gap:20px}
+  .hd-r{gap:14px}
+  .ft-st{grid-column:1/span 5}
+  .fc1{grid-column:7/span 2}.fc2{grid-column:9/span 2}.fc3{grid-column:11/span 2}
+}
+@media (max-width:960px){
+  .mem{display:flex;flex-direction:column;align-items:stretch;row-gap:24px}
+  .mem-tx{max-width:560px;gap:24px}
+  .ss-frame{aspect-ratio:4/3.4}
+  .cards{display:flex;gap:10px;overflow-x:auto;margin:0 -16px;padding:0 16px;scroll-snap-type:x mandatory;scroll-padding-inline:16px;scrollbar-width:none}
+  .cards::-webkit-scrollbar{display:none}
+  .cards>li{flex:0 0 clamp(236px,30vw,300px);scroll-snap-align:start}
+  .how-tx{grid-column:1/span 7}
+  .how-fig{grid-column:9/span 4}
+  .ft-st{grid-column:1/span 12;margin-bottom:48px}
+  .fc1{grid-column:1/span 4}.fc2{grid-column:5/span 4}.fc3{grid-column:9/span 4}
+}
+/* phone */
+@media (max-width:760px){
+  :root{--sec:72px}
+  body{font-size:15px}
+  .d-only{display:none}
+  .m-only{display:inline}
+  .big{font-size:28px;line-height:1.22;letter-spacing:-.02em}
+  .hd{display:flex;justify-content:space-between;height:56px;padding-right:max(4px,env(safe-area-inset-right,0px))}
+  .nav,.hd-signin,.hd .btn{display:none}
+  .hd-r{gap:0}
+  .lang{height:44px;min-width:40px}
+  .menu-b{display:flex}
+  .hero{padding-top:24px}
+  .stmt{font-size:28px;line-height:1.22}
+  .hero-fig{margin-top:28px;gap:10px}
+  .hero-cap{display:flex;justify-content:space-between;align-items:center}
+  .hero-cap .c2{min-height:44px;display:inline-flex;align-items:center;background-position:0 calc(100% - 12px)}
+  .ss-frame{aspect-ratio:358/440}
+  .ss-img.ivy{object-position:50% 10%}
+  .ss-ctl{left:10px;bottom:10px}
+  .ss-ctl button.pg{width:44px;height:44px}
+  .mem-tx{gap:24px}
+  .ctas{flex-direction:column}
+  .ctas a{width:100%}
+  .p-head{align-items:center;margin-bottom:8px}
+  .p-head .u{min-height:44px;display:inline-flex;align-items:center;background-position:0 calc(100% - 12px)}
+  .cards>li{flex:0 0 236px}
+  .card{gap:10px}
+  .meta{gap:0}
+  .meta .nm{font-size:15px}
+  .how{display:flex;flex-direction:column}
+  .how-tx{gap:16px}
+  .how-tx .u{min-height:44px;display:inline-flex;align-items:center;background-position:0 calc(100% - 10px)}
+  .how-fig{display:none}
+  .jn h2{margin-bottom:8px}
+  .jt{font-size:20px;letter-spacing:-.01em;line-height:1.25}
+  .ja svg{width:18px;height:18px}
+  .faq{display:block}
+  .faq>h2{margin-bottom:8px}
+  .acc summary{min-height:56px;padding:0;font-size:15px;letter-spacing:0}
+  .acc-body p{padding-bottom:16px}
+  .ft{padding-top:48px;padding-bottom:28px;gap:48px}
+  .ft-st{gap:20px;margin-bottom:28px}
+  .ft-st .btn{width:100%}
+  .fc{gap:0}
+  .fc a{min-height:44px;display:flex;align-items:center}
+  .fc1{grid-column:1/span 6}.fc2{grid-column:7/span 6}.fc3{display:none}
+  .ft-b{gap:16px}
+}
+</style>
+</head>
+<body>
+
+<header class="hd g12 px16" data-header>
+  <a class="logo" href="#top" aria-label="Iconec home"><svg viewBox="0 0 220 84.29" fill="currentColor" role="img" aria-label="Iconec" style="height: 18px; width: auto; display: block"><path d="M2.039 82.958V10.407H0V9.074H10.749V10.407H8.71V82.958H10.749V84.291H0V82.958H2.039Z"></path><path d="M18.686 65.011V28.352C18.686 22.874 20.757 17.638 24.366 13.983C27.438 10.871 31.403 9.127 35.529 9.074H35.581C39.691 9.139 43.643 10.881 46.702 13.983C50.267 17.591 52.336 22.764 52.381 28.172V35.035H45.712V21.975C45.673 18.709 44.41 15.579 42.251 13.393C40.402 11.52 38.019 10.46 35.538 10.407C33.053 10.457 30.667 11.518 28.818 13.391C26.658 15.577 25.398 18.709 25.357 21.984V71.386C25.396 74.652 26.658 77.782 28.816 79.968C30.666 81.841 33.051 82.902 35.534 82.954C39.367 82.901 43.051 81.279 45.906 78.387C49.268 74.985 51.194 70.11 51.194 65.009V64.516H52.381V65.009C52.381 70.485 50.31 75.723 46.701 79.376C43.629 82.488 39.666 84.232 35.539 84.287H35.531L35.536 83.794L35.528 84.287C31.402 84.232 27.438 82.488 24.366 79.376C20.757 75.723 18.686 70.485 18.686 65.009V65.011Z"></path><path d="M107.554 9.074L133.984 80.292V14.861C133.889 13.653 133.399 12.533 132.601 11.706C131.793 10.868 130.743 10.407 129.642 10.407H129.202V9.074H137.208V10.407H135.17V84.291H128.696L102.266 13.073V78.501C102.361 79.71 102.851 80.83 103.649 81.657C104.457 82.495 105.507 82.956 106.608 82.956H107.048V84.289H99.042V82.956H101.08V10.407H99.042V9.074H107.554Z"></path><path d="M145.724 82.956V10.405H143.685V9.072H179.816V21.976H178.629V21.483C178.629 15.609 174.547 10.745 169.334 10.403H152.397V46.012H163.017C166.237 45.797 168.759 42.791 168.759 39.161V38.668H169.946V54.687H168.759V54.194C168.759 50.565 166.237 47.557 163.017 47.343H152.397V82.951H169.334C174.548 82.609 178.629 77.745 178.629 71.872V71.379H179.816V84.282H143.685V82.949H145.724V82.956Z"></path><path d="M186.303 65.011V28.352C186.303 22.874 188.374 17.638 191.984 13.983C195.055 10.871 199.02 9.127 203.147 9.074H203.199C207.308 9.139 211.26 10.881 214.32 13.983C217.884 17.591 219.953 22.764 219.998 28.172V35.035H213.329V21.975C213.29 18.709 212.028 15.579 209.868 13.393C208.021 11.52 205.636 10.46 203.155 10.407C200.67 10.457 198.284 11.518 196.433 13.391C194.274 15.577 193.013 18.709 192.973 21.984V71.386C193.011 74.652 194.274 77.782 196.433 79.968C198.283 81.841 200.669 82.902 203.152 82.954C206.984 82.901 210.668 81.279 213.523 78.387C216.885 74.985 218.811 70.11 218.811 65.009V64.516H219.998V65.009C219.998 70.485 217.928 75.723 214.318 79.376C211.246 82.488 207.283 84.232 203.157 84.287H203.148L203.152 83.794L203.143 84.287C199.017 84.232 195.054 82.488 191.982 79.376C188.372 75.723 186.302 70.485 186.302 65.009L186.303 65.011Z"></path><g transform="translate(58.82 0) scale(0.52775)"><path d="M36.942 17.629C40.341 13.429 47.362 5.086 47.362 5.086V1.976H45.192V4.162C45.192 4.162 34.594 17.251 34.591 17.254V19.989C38.343 20.638 41.949 22.506 44.805 25.397C48.897 29.54 51.286 35.471 51.362 41.66V135.269C51.289 141.474 48.897 147.408 44.805 151.551C41.297 155.103 36.773 157.114 32.065 157.209H31.938C27.23 157.114 22.706 155.103 19.198 151.551C15.107 147.408 12.717 141.477 12.641 135.288V41.675C12.714 35.471 15.107 29.536 19.198 25.393C22.188 22.366 26.067 20.46 30.016 19.904V17.264L19.373 4.159V1.973H17.203V5.083C17.203 5.083 24.294 13.416 27.69 17.585C21.692 18.503 16.295 21.264 11.618 25.676C11.329 25.95 11.046 26.226 10.764 26.512C3.924 33.438 0 43.362 0 53.742V123.203C0 133.582 3.924 143.504 10.764 150.429C16.584 156.326 24.094 159.63 31.919 159.735H32.011H32.09C39.906 159.63 47.416 156.326 53.236 150.429C60.076 143.507 64 133.582 64 123.206V53.742C64 43.362 60.076 33.441 53.236 26.515C48.541 21.759 43.111 18.693 36.945 17.629"></path><path d="M40.656 0.016H23.869L21.486 4.159L32.297 17.222L43.051 4.159L40.656 0.016ZM31.185 12.486L23.973 3.854L25.101 2.002H31.185V12.486ZM33.364 12.486V2.002H39.448L40.576 3.854L33.364 12.486Z"></path></g></svg></a>
+  <nav class="nav t" aria-label="Main">
+    <a href="#pieces">Pieces</a>
+    <a href="#membership">Membership</a>
+    <a href="#how">How it works</a>
+    <a href="#journal">Journal</a>
+  </nav>
+  <div class="hd-r t">
+    <div class="langs" role="group" aria-label="Language" data-lang><button class="lang" type="button" aria-pressed="true">EN</button><button class="lang" type="button" aria-pressed="false" lang="ar">ع</button></div>
+    <a class="hd-signin" href="#signin">Sign in</a>
+    <a class="btn" href="#membership">Become a member</a>
+    <button class="menu-b" type="button" data-menu-open aria-controls="menu" aria-expanded="false" aria-label="Open menu"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M3 8h16"/><path d="M3 14h16"/></svg></button>
+  </div>
+</header>
+
+<div id="menu" data-menu role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="sheet-top">
+    <a class="logo" href="#top" aria-label="Iconec home"><svg viewBox="0 0 220 84.29" fill="currentColor" role="img" aria-label="Iconec" style="height: 18px; width: auto; display: block"><path d="M2.039 82.958V10.407H0V9.074H10.749V10.407H8.71V82.958H10.749V84.291H0V82.958H2.039Z"></path><path d="M18.686 65.011V28.352C18.686 22.874 20.757 17.638 24.366 13.983C27.438 10.871 31.403 9.127 35.529 9.074H35.581C39.691 9.139 43.643 10.881 46.702 13.983C50.267 17.591 52.336 22.764 52.381 28.172V35.035H45.712V21.975C45.673 18.709 44.41 15.579 42.251 13.393C40.402 11.52 38.019 10.46 35.538 10.407C33.053 10.457 30.667 11.518 28.818 13.391C26.658 15.577 25.398 18.709 25.357 21.984V71.386C25.396 74.652 26.658 77.782 28.816 79.968C30.666 81.841 33.051 82.902 35.534 82.954C39.367 82.901 43.051 81.279 45.906 78.387C49.268 74.985 51.194 70.11 51.194 65.009V64.516H52.381V65.009C52.381 70.485 50.31 75.723 46.701 79.376C43.629 82.488 39.666 84.232 35.539 84.287H35.531L35.536 83.794L35.528 84.287C31.402 84.232 27.438 82.488 24.366 79.376C20.757 75.723 18.686 70.485 18.686 65.009V65.011Z"></path><path d="M107.554 9.074L133.984 80.292V14.861C133.889 13.653 133.399 12.533 132.601 11.706C131.793 10.868 130.743 10.407 129.642 10.407H129.202V9.074H137.208V10.407H135.17V84.291H128.696L102.266 13.073V78.501C102.361 79.71 102.851 80.83 103.649 81.657C104.457 82.495 105.507 82.956 106.608 82.956H107.048V84.289H99.042V82.956H101.08V10.407H99.042V9.074H107.554Z"></path><path d="M145.724 82.956V10.405H143.685V9.072H179.816V21.976H178.629V21.483C178.629 15.609 174.547 10.745 169.334 10.403H152.397V46.012H163.017C166.237 45.797 168.759 42.791 168.759 39.161V38.668H169.946V54.687H168.759V54.194C168.759 50.565 166.237 47.557 163.017 47.343H152.397V82.951H169.334C174.548 82.609 178.629 77.745 178.629 71.872V71.379H179.816V84.282H143.685V82.949H145.724V82.956Z"></path><path d="M186.303 65.011V28.352C186.303 22.874 188.374 17.638 191.984 13.983C195.055 10.871 199.02 9.127 203.147 9.074H203.199C207.308 9.139 211.26 10.881 214.32 13.983C217.884 17.591 219.953 22.764 219.998 28.172V35.035H213.329V21.975C213.29 18.709 212.028 15.579 209.868 13.393C208.021 11.52 205.636 10.46 203.155 10.407C200.67 10.457 198.284 11.518 196.433 13.391C194.274 15.577 193.013 18.709 192.973 21.984V71.386C193.011 74.652 194.274 77.782 196.433 79.968C198.283 81.841 200.669 82.902 203.152 82.954C206.984 82.901 210.668 81.279 213.523 78.387C216.885 74.985 218.811 70.11 218.811 65.009V64.516H219.998V65.009C219.998 70.485 217.928 75.723 214.318 79.376C211.246 82.488 207.283 84.232 203.157 84.287H203.148L203.152 83.794L203.143 84.287C199.017 84.232 195.054 82.488 191.982 79.376C188.372 75.723 186.302 70.485 186.302 65.009L186.303 65.011Z"></path><g transform="translate(58.82 0) scale(0.52775)"><path d="M36.942 17.629C40.341 13.429 47.362 5.086 47.362 5.086V1.976H45.192V4.162C45.192 4.162 34.594 17.251 34.591 17.254V19.989C38.343 20.638 41.949 22.506 44.805 25.397C48.897 29.54 51.286 35.471 51.362 41.66V135.269C51.289 141.474 48.897 147.408 44.805 151.551C41.297 155.103 36.773 157.114 32.065 157.209H31.938C27.23 157.114 22.706 155.103 19.198 151.551C15.107 147.408 12.717 141.477 12.641 135.288V41.675C12.714 35.471 15.107 29.536 19.198 25.393C22.188 22.366 26.067 20.46 30.016 19.904V17.264L19.373 4.159V1.973H17.203V5.083C17.203 5.083 24.294 13.416 27.69 17.585C21.692 18.503 16.295 21.264 11.618 25.676C11.329 25.95 11.046 26.226 10.764 26.512C3.924 33.438 0 43.362 0 53.742V123.203C0 133.582 3.924 143.504 10.764 150.429C16.584 156.326 24.094 159.63 31.919 159.735H32.011H32.09C39.906 159.63 47.416 156.326 53.236 150.429C60.076 143.507 64 133.582 64 123.206V53.742C64 43.362 60.076 33.441 53.236 26.515C48.541 21.759 43.111 18.693 36.945 17.629"></path><path d="M40.656 0.016H23.869L21.486 4.159L32.297 17.222L43.051 4.159L40.656 0.016ZM31.185 12.486L23.973 3.854L25.101 2.002H31.185V12.486ZM33.364 12.486V2.002H39.448L40.576 3.854L33.364 12.486Z"></path></g></svg></a>
+    <button class="close-b" type="button" data-menu-close aria-label="Close menu"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M5 5l12 12"/><path d="M17 5L5 17"/></svg></button>
+  </div>
+  <nav class="m-links" aria-label="Menu">
+    <a href="#pieces">Pieces</a>
+    <a href="#membership">Membership</a>
+    <a href="#how">How it works</a>
+    <a href="#journal">Journal</a>
+    <a href="#signin">Sign in</a>
+  </nav>
+  <a class="btn" href="#membership">Become a member</a>
+</div>
+
+<main>
+<section id="top" class="hero px16" data-hero data-note="The statement rises line by line, 50ms apart. Then the underline under “Become a member” draws in, the photo unmasks upwards and settles (about 1.4s), and the caption fades in last.">
+  <h1 class="stmt">Iconec is a membership for real diamond jewellery in the UAE. Hold up to three pieces of 18k gold with IGI-certified diamonds, swap them from day 2, and never buy. <a class="hl" href="#membership">Become a member</a></h1>
+  <figure class="hero-fig">
+    <div class="hero-ph"><span class="hm"><img class="hi" src="shot-earrings.jpg" width="965" height="1200" alt="A pair of diamond drop earrings in 18k gold on dark slate" decoding="async" fetchpriority="high"></span></div>
+    <figcaption class="hero-cap t g12"><span class="c1">New this month<span class="d-only"> · Piece name, earrings</span></span><a class="u c2" href="#pieces"><span class="d-only">See this month’s pieces</span><span class="m-only">See the pieces</span></a></figcaption>
+  </figure>
+</section>
+
+<section id="membership" class="mem g12 sec px16" data-note="The photo unmasks as it scrolls in, and the plan text and price rows rise 50ms apart. The arrows (or a swipe) crossfade 4 photos: out in 160ms, in over 260ms with a slight settle. The counter rolls (240ms).">
+  <div class="ss">
+    <div class="ss-frame" data-reveal="img" role="region" aria-roledescription="carousel" aria-label="Pieces you can hold">
+      <span class="rv-mask"><span class="ss-stage">
+        <img class="ss-img on" src="riviere.jpg" width="724" height="900" alt="The Windfall, a two-row diamond necklace in 18k gold" decoding="async" loading="lazy">
+        <img class="ss-img" src="pendant.jpg" width="724" height="900" alt="A diamond leaf pendant with a red drop" decoding="async" loading="lazy" aria-hidden="true">
+        <img class="ss-img ivy" src="ring.jpg" width="501" height="900" alt="The Ivy, an 18k gold ring with diamonds" decoding="async" loading="lazy" aria-hidden="true">
+        <img class="ss-img" src="shot-earrings.jpg" width="965" height="1200" alt="A pair of diamond drop earrings in 18k gold" decoding="async" loading="lazy" aria-hidden="true">
+      </span></span>
+      <div class="ss-ctl num">
+        <span class="pg cnt" aria-hidden="true"><span class="roll"><span>1</span></span>&nbsp;/ 4</span>
+        <button class="pg press" type="button" data-ss="-1" aria-label="Previous image"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M8.5 3L4.5 7l4 4"/></svg></button>
+        <button class="pg press" type="button" data-ss="1" aria-label="Next image"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M5.5 3l4 4-4 4"/></svg></button>
+      </div>
+      <p class="sr" aria-live="polite" data-ss-live>Image 1 of 4: The Windfall, necklace</p>
+    </div>
+  </div>
+  <div class="mem-tx">
+    <h2 class="mem-h" data-reveal>Hold 1, 2 or 3 pieces at a time, for AED 299, AED 450 or AED 599 a month. Swap any piece from day 2. Send it back by day 30, or keep it 30 days longer. Your first AED 299 is on us.</h2>
+    <ul class="plans num" data-stagger="50">
+      <li data-reveal><span>1 piece</span><span class="sub">AED 299 a month</span></li>
+      <li data-reveal><span>2 pieces</span><span class="sub">AED 450 a month</span></li>
+      <li data-reveal><span>3 pieces</span><span class="sub">AED 599 a month</span></li>
+    </ul>
+    <div class="ctas" data-reveal style="--d:150ms"><a class="btn" href="#join">Become a member</a><a class="btn-o" href="#how">How it works</a></div>
+  </div>
+</section>
+
+<section id="pieces" class="pieces sec px16" data-note="Card photos unmask left to right, 50ms apart. Each “New” chip fades in after its photo, then the name rises. Hover zooms the photo to 1.03 (240ms).">
+  <div class="p-head" data-reveal="fade">
+    <h2 class="t">Pieces this month</h2>
+    <a class="u" href="#all">See all<span class="d-only"> pieces</span></a>
+  </div>
+  <ul class="cards num" data-stagger="50">
+    <li style="--i:0"><a class="card press" href="#ivy"><span class="ph zoom" data-reveal="img"><img class="ivy" src="ring.jpg" width="501" height="900" alt="The Ivy, an 18k gold ring with diamonds" decoding="async" loading="lazy"><span class="chip">New</span></span><span class="meta"><span class="t sub">Ring</span><span class="nm">The Ivy</span><span class="sub">Retail value AED 00,000</span></span></a></li>
+    <li style="--i:1"><a class="card press" href="#windfall"><span class="ph zoom" data-reveal="img"><img src="riviere.jpg" width="724" height="900" alt="The Windfall, a two-row diamond necklace" decoding="async" loading="lazy"><span class="chip">New</span></span><span class="meta"><span class="t sub">Necklace</span><span class="nm">The Windfall</span><span class="sub">Retail value AED 00,000</span></span></a></li>
+    <li style="--i:2"><a class="card press" href="#p3"><span class="ph zoom" data-reveal="img"><img src="shot-earrings.jpg" width="965" height="1200" alt="Diamond drop earrings in 18k gold" decoding="async" loading="lazy"><span class="chip">New</span></span><span class="meta"><span class="t sub">Earrings</span><span class="nm">Piece name</span><span class="sub">Retail value AED 00,000</span></span></a></li>
+    <li style="--i:3"><a class="card press" href="#p4"><span class="ph zoom" data-reveal="img"><img src="pendant.jpg" width="724" height="900" alt="A diamond leaf pendant with a red drop" decoding="async" loading="lazy"><span class="chip">New</span></span><span class="meta"><span class="t sub">Pendant</span><span class="nm">Piece name</span><span class="sub">Retail value AED 00,000</span></span></a></li>
+  </ul>
+</section>
+
+<section id="how" class="how g12 sec px16" data-note="The sentence rises first. The pendant unmasks 150ms later and then drifts slightly against the scroll.">
+  <div class="how-tx">
+    <h2 class="big" data-reveal>Joining takes three steps on the website: choose a plan, pick your pieces, set a delivery. There is no waitlist and no approval.</h2>
+    <a class="u" href="#membership" data-reveal style="--d:100ms">Choose a plan</a>
+  </div>
+  <figure class="how-fig">
+    <div class="how-ph" data-reveal="img" style="--d:150ms"><span class="rv-mask"><span class="px"><img src="pendant.jpg" width="724" height="900" alt="A diamond leaf pendant with a red drop on dark slate" decoding="async" loading="lazy" data-parallax="0.06"></span></span></div>
+    <figcaption class="t" data-reveal="fade" style="--d:400ms"><span>Piece name, pendant</span><span class="sub">18k gold · IGI certified</span></figcaption>
+  </figure>
+</section>
+
+<section id="journal" class="jn sec px16" data-note="Each row’s hairline draws, then its title rises from a mask (rows 50ms apart). On hover the title slides 6px right and the arrow nudges: 240ms in, 200ms back.">
+  <h2 class="t" data-reveal="fade">From the journal</h2>
+  <ul class="jlist">
+    <li class="jrow" data-reveal="row" style="--i:0"><a class="jl" href="#j1"><span class="jrule" aria-hidden="true"></span><span class="jt"><span class="jt-in">Thirty days with a diamond</span></span><span class="ja"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M4 11h14"/><path d="M12 5l6 6-6 6"/></svg></span></a></li>
+    <li class="jrow" data-reveal="row" style="--i:1"><a class="jl" href="#j2"><span class="jrule" aria-hidden="true"></span><span class="jt"><span class="jt-in">How a diamond is graded</span></span><span class="ja"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M4 11h14"/><path d="M12 5l6 6-6 6"/></svg></span></a></li>
+    <li class="jrow" data-reveal="row" style="--i:2"><a class="jl" href="#j3"><span class="jrule" aria-hidden="true"></span><span class="jt"><span class="jt-in">What to wear to an Eid night</span></span><span class="ja"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M4 11h14"/><path d="M12 5l6 6-6 6"/></svg></span></a></li>
+  </ul>
+  <span class="jend" data-reveal="rule" style="--d:150ms" aria-hidden="true"></span>
+</section>
+
+<section id="faq" class="faq g12 sec px16" data-note="Questions rise 50ms apart. An answer opens in 280ms and closes in 200ms; the plus turns into a minus.">
+  <h2 class="t" data-reveal="fade">Questions</h2>
+  <div class="faq-l" data-stagger="50">
+    <details class="acc" open data-reveal><summary><span class="q">Who can become a member?</span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 8h12"/><path class="plus-v" d="M8 2v12"/></svg></summary><div class="acc-body"><p class="sub">Anyone can join on the website. Choose a plan, pick your pieces and set a delivery. There is no waitlist and no approval.</p></div></details>
+    <details class="acc" data-reveal><summary><span class="q">Do I ever have to buy a piece?</span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 8h12"/><path class="plus-v" d="M8 2v12"/></svg></summary><div class="acc-body"><p class="sub">No. You hold, wear and swap. Nothing to buy.</p></div></details>
+    <details class="acc" data-reveal><summary><span class="q">What if a piece is lost or damaged?</span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 8h12"/><path class="plus-v" d="M8 2v12"/></svg></summary><div class="acc-body"><p class="sub">[Answer placeholder: cover, deposit and what happens next.]</p></div></details>
+  </div>
+</section>
+</main>
+
+<footer id="join" class="ft px16" data-note="The statement rises, then the white button fades in. The link columns follow 50ms apart, and the bottom rule draws.">
+  <div class="ft-top g12">
+    <div class="ft-st">
+      <p class="big" data-reveal>Your first AED 299 is on us. Hold up to three pieces from this month.</p>
+      <a class="btn btn-w" href="#membership" data-reveal="fade" style="--d:250ms">Become a member</a>
+    </div>
+    <div class="fc fc1 t" data-reveal style="--d:100ms"><p>Pieces</p><a href="#r">Rings</a><a href="#n">Necklaces</a><a href="#e">Earrings</a></div>
+    <div class="fc fc2 t" data-reveal style="--d:150ms"><p>Help</p><a href="#faq">Questions</a><a href="#contact">Contact</a><a href="#delivery">Delivery</a></div>
+    <div class="fc fc3 t" data-reveal style="--d:200ms"><p>Iconec</p><a href="#story">Story</a><a href="#journal">Journal</a><a href="#ig">Instagram</a></div>
+  </div>
+  <div class="ft-b">
+    <span class="ft-rule" data-reveal="rule" aria-hidden="true"></span>
+    <div class="ft-bot t" data-reveal="fade" style="--d:200ms"><svg viewBox="0 0 220 84.29" fill="currentColor" role="img" aria-label="Iconec" style="height: 16px; width: auto; display: block"><path d="M2.039 82.958V10.407H0V9.074H10.749V10.407H8.71V82.958H10.749V84.291H0V82.958H2.039Z"></path><path d="M18.686 65.011V28.352C18.686 22.874 20.757 17.638 24.366 13.983C27.438 10.871 31.403 9.127 35.529 9.074H35.581C39.691 9.139 43.643 10.881 46.702 13.983C50.267 17.591 52.336 22.764 52.381 28.172V35.035H45.712V21.975C45.673 18.709 44.41 15.579 42.251 13.393C40.402 11.52 38.019 10.46 35.538 10.407C33.053 10.457 30.667 11.518 28.818 13.391C26.658 15.577 25.398 18.709 25.357 21.984V71.386C25.396 74.652 26.658 77.782 28.816 79.968C30.666 81.841 33.051 82.902 35.534 82.954C39.367 82.901 43.051 81.279 45.906 78.387C49.268 74.985 51.194 70.11 51.194 65.009V64.516H52.381V65.009C52.381 70.485 50.31 75.723 46.701 79.376C43.629 82.488 39.666 84.232 35.539 84.287H35.531L35.536 83.794L35.528 84.287C31.402 84.232 27.438 82.488 24.366 79.376C20.757 75.723 18.686 70.485 18.686 65.009V65.011Z"></path><path d="M107.554 9.074L133.984 80.292V14.861C133.889 13.653 133.399 12.533 132.601 11.706C131.793 10.868 130.743 10.407 129.642 10.407H129.202V9.074H137.208V10.407H135.17V84.291H128.696L102.266 13.073V78.501C102.361 79.71 102.851 80.83 103.649 81.657C104.457 82.495 105.507 82.956 106.608 82.956H107.048V84.289H99.042V82.956H101.08V10.407H99.042V9.074H107.554Z"></path><path d="M145.724 82.956V10.405H143.685V9.072H179.816V21.976H178.629V21.483C178.629 15.609 174.547 10.745 169.334 10.403H152.397V46.012H163.017C166.237 45.797 168.759 42.791 168.759 39.161V38.668H169.946V54.687H168.759V54.194C168.759 50.565 166.237 47.557 163.017 47.343H152.397V82.951H169.334C174.548 82.609 178.629 77.745 178.629 71.872V71.379H179.816V84.282H143.685V82.949H145.724V82.956Z"></path><path d="M186.303 65.011V28.352C186.303 22.874 188.374 17.638 191.984 13.983C195.055 10.871 199.02 9.127 203.147 9.074H203.199C207.308 9.139 211.26 10.881 214.32 13.983C217.884 17.591 219.953 22.764 219.998 28.172V35.035H213.329V21.975C213.29 18.709 212.028 15.579 209.868 13.393C208.021 11.52 205.636 10.46 203.155 10.407C200.67 10.457 198.284 11.518 196.433 13.391C194.274 15.577 193.013 18.709 192.973 21.984V71.386C193.011 74.652 194.274 77.782 196.433 79.968C198.283 81.841 200.669 82.902 203.152 82.954C206.984 82.901 210.668 81.279 213.523 78.387C216.885 74.985 218.811 70.11 218.811 65.009V64.516H219.998V65.009C219.998 70.485 217.928 75.723 214.318 79.376C211.246 82.488 207.283 84.232 203.157 84.287H203.148L203.152 83.794L203.143 84.287C199.017 84.232 195.054 82.488 191.982 79.376C188.372 75.723 186.302 70.485 186.302 65.009L186.303 65.011Z"></path><g transform="translate(58.82 0) scale(0.52775)"><path d="M36.942 17.629C40.341 13.429 47.362 5.086 47.362 5.086V1.976H45.192V4.162C45.192 4.162 34.594 17.251 34.591 17.254V19.989C38.343 20.638 41.949 22.506 44.805 25.397C48.897 29.54 51.286 35.471 51.362 41.66V135.269C51.289 141.474 48.897 147.408 44.805 151.551C41.297 155.103 36.773 157.114 32.065 157.209H31.938C27.23 157.114 22.706 155.103 19.198 151.551C15.107 147.408 12.717 141.477 12.641 135.288V41.675C12.714 35.471 15.107 29.536 19.198 25.393C22.188 22.366 26.067 20.46 30.016 19.904V17.264L19.373 4.159V1.973H17.203V5.083C17.203 5.083 24.294 13.416 27.69 17.585C21.692 18.503 16.295 21.264 11.618 25.676C11.329 25.95 11.046 26.226 10.764 26.512C3.924 33.438 0 43.362 0 53.742V123.203C0 133.582 3.924 143.504 10.764 150.429C16.584 156.326 24.094 159.63 31.919 159.735H32.011H32.09C39.906 159.63 47.416 156.326 53.236 150.429C60.076 143.507 64 133.582 64 123.206V53.742C64 43.362 60.076 33.441 53.236 26.515C48.541 21.759 43.111 18.693 36.945 17.629"></path><path d="M40.656 0.016H23.869L21.486 4.159L32.297 17.222L43.051 4.159L40.656 0.016ZM31.185 12.486L23.973 3.854L25.101 2.002H31.185V12.486ZM33.364 12.486V2.002H39.448L40.576 3.854L33.364 12.486Z"></path></g></svg><span><span class="d-only">English · العربية · UAE · AED · © 2026 Iconec</span><span class="m-only">English · العربية · UAE</span></span></div>
+  </div>
+</footer>
+
+<script src="motion.js"></script>
+<script>
+/* The Showroom: statement split into rendered lines for the load sequence, and the Windfall slideshow */
+(function () {
+  var reduce = window.iconecReduce ? window.iconecReduce() : false;
+
+  /* 1 · statement: wrap each rendered line in an h-line mask once the face has loaded */
+  var hero = document.querySelector('.hero'), h1 = hero && hero.querySelector('.stmt');
+  if (h1) {
+    var tmp = document.createElement('div'); tmp.innerHTML = h1.innerHTML;
+    var toks = [];
+    function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+    [].forEach.call(tmp.childNodes, function (n) {
+      if (n.nodeType === 3) n.textContent.split(/\s+/).forEach(function (w) { if (w) toks.push(esc(w)); });
+      else if (n.nodeType === 1) toks.push(n.outerHTML);
+    });
+    var split = function () {
+      h1.innerHTML = toks.map(function (t) { return '<span class="w">' + t + '</span>'; }).join(' ');
+      var tops = [].map.call(h1.querySelectorAll('.w'), function (w) { return w.offsetTop; }); /* one batch of reads */
+      var lines = [], last = null;
+      tops.forEach(function (tp, i) { if (last === null || Math.abs(tp - last) > 4) { lines.push([]); last = tp; } lines[lines.length - 1].push(toks[i]); });
+      h1.innerHTML = lines.map(function (l, i) { return '<span class="h-line" style="--i:' + i + '"><span>' + l.join(' ') + '</span></span>'; }).join('');
+      hero.style.setProperty('--n', lines.length);
+      h1.classList.add('split');
+      return lines.length;
+    };
+    if (reduce) { h1.classList.add('split'); hero.classList.add('go', 'settled'); }
+    else {
+      var started = false;
+      var start = function () {
+        if (started) return; started = true;
+        var n = split();
+        requestAnimationFrame(function () { requestAnimationFrame(function () {
+          hero.classList.add('go');
+          setTimeout(function () { hero.classList.add('settled'); }, n * 50 + 2000);
+        }); });
+      };
+      (document.fonts && document.fonts.load ? document.fonts.load('400 32px "Overused Grotesk"') : Promise.resolve()).then(start, start);
+      setTimeout(start, 900);
+      var lw = window.innerWidth, rt;
+      window.addEventListener('resize', function () {
+        if (!started || window.innerWidth === lw) return;
+        lw = window.innerWidth; clearTimeout(rt); rt = setTimeout(split, 150);
+      });
+    }
+  }
+
+  /* 2 · Windfall slideshow: crossfade + settle, rolling counter, arrows / swipe / arrow keys, no autoplay */
+  var frame = document.querySelector('.ss-frame');
+  if (!frame) return;
+  var imgs = [].slice.call(frame.querySelectorAll('.ss-img'));
+  var names = ['The Windfall, necklace', 'Piece name, pendant', 'The Ivy, ring', 'Piece name, earrings'];
+  var roll = frame.querySelector('.roll'), live = frame.querySelector('[data-ss-live]');
+  var cur = 0;
+  var OUT = 'cubic-bezier(.16,1,.3,1)', IN = 'cubic-bezier(.7,0,.84,0)';
+  function rollTo(n, dir) {
+    var old = roll.lastElementChild;
+    [].slice.call(roll.children).forEach(function (c) { if (c !== old) c.remove(); });
+    var nu = document.createElement('span'); nu.textContent = n;
+    roll.appendChild(nu);
+    if (reduce || !nu.animate) { old.remove(); return; }
+    var from = dir > 0 ? '100%' : '-100%', to = dir > 0 ? '-100%' : '100%';
+    /* the two digits move as one strip (240ms ease-out); the old one also fades away (160ms ease-in) */
+    old.animate([{ transform: 'translate3d(0,0,0)', opacity: 1 }, { transform: 'translate3d(0,' + to + ',0)', opacity: 0 }],
+      { duration: 240, easing: OUT, fill: 'forwards' }).onfinish = function () { old.remove(); };
+    setTimeout(function () { if (old.parentNode) old.remove(); }, 300);
+    old.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160, easing: IN, fill: 'forwards' });
+    nu.animate([{ transform: 'translate3d(0,' + from + ',0)' }, { transform: 'translate3d(0,0,0)' }], { duration: 240, easing: OUT });
+  }
+  function step(dir) {
+    var next = (cur + dir + imgs.length) % imgs.length;
+    imgs[cur].classList.remove('on'); imgs[cur].setAttribute('aria-hidden', 'true');
+    imgs[next].classList.add('on'); imgs[next].removeAttribute('aria-hidden');
+    rollTo(next + 1, dir);
+    live.textContent = 'Image ' + (next + 1) + ' of ' + imgs.length + ': ' + names[next];
+    cur = next;
+  }
+  frame.querySelectorAll('[data-ss]').forEach(function (b) {
+    b.addEventListener('click', function () { step(parseInt(b.getAttribute('data-ss'), 10)); });
+  });
+  frame.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
+  });
+  var sx = null, sy = 0;
+  frame.addEventListener('touchstart', function (e) { var t = e.touches[0]; sx = t.clientX; sy = t.clientY; }, { passive: true });
+  frame.addEventListener('touchend', function (e) {
+    if (sx === null) return;
+    var t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy; sx = null;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) step(dx < 0 ? 1 : -1);
+  }, { passive: true });
+})();
+</script>
+</body>
+</html>

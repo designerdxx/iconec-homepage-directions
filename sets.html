@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>(function(d){var h=d.documentElement;h.classList.add("js");var s=/[?&]still\b/.test(location.search);if(s)h.classList.add("still");if(s||(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches))h.classList.add("rm");})(document)</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Sets · Iconec motion prototype</title>
+<meta name="iconec-index" content="index.html">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500&display=swap">
+<link rel="stylesheet" href="base.css">
+<style>
+:root{
+  --ivory:#FAF9F4; --box:#FFFFFF; --box-line:rgba(20,26,20,.14); --hover:#F3F2EC;
+  --g:clamp(20px,2.78vw,40px);
+  --lc:300px; --cg:100px;
+}
+body{background:var(--ivory)}
+a:hover{color:var(--green)}
+.box{background:var(--box);box-shadow:inset 0 0 0 1px var(--box-line)}
+/* hovers: arrive in --t-ui ease-out, un-hover leaves in --t-ui-exit ease-in */
+.lnk{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px;text-decoration-color:rgba(20,26,20,.3);transition:text-decoration-color var(--t-ui-exit) var(--ease-in)}
+.lnk:hover{text-decoration-color:var(--ink);transition-duration:var(--t-ui);transition-timing-function:var(--ease-out)}
+
+/* square buttons for this direction */
+.btn{border-radius:0;min-height:44px;height:44px;padding:0 20px;font-size:13px}
+.btn-w{display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 20px;background:#fff;color:var(--ink);font-weight:500;font-size:13px;white-space:nowrap;transition:background-color var(--t-ui-exit) var(--ease-in),transform var(--t-press) var(--ease-out)}
+.btn-w:hover{background:#EFEEEA;color:var(--ink);transition:background-color var(--t-ui) var(--ease-out),transform var(--t-press) var(--ease-out)}
+.choose{display:flex;align-items:center;justify-content:space-between;gap:16px;height:52px;padding:0 18px;background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);font-weight:500;white-space:nowrap;transition:background-color var(--t-ui-exit) var(--ease-in),color var(--t-ui-exit) var(--ease-in),box-shadow var(--t-ui-exit) var(--ease-in),transform var(--t-press) var(--ease-out)}
+.choose:hover{background:var(--green);color:#fff;box-shadow:inset 0 0 0 1px var(--green);transition:background-color var(--t-ui) var(--ease-out),color var(--t-ui) var(--ease-out),box-shadow var(--t-ui) var(--ease-out),transform var(--t-press) var(--ease-out)}
+.lang{opacity:1;color:var(--sub);min-width:44px;padding:0 10px;font-family:"Overused Grotesk","Noto Kufi Arabic",sans-serif}
+.lang[aria-pressed="true"]{color:var(--ink);text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:1px}
+
+/* ---------- floating boxed header ---------- */
+[data-header].hdr{top:0;height:160px;padding:24px 24px 0;display:flex;align-items:flex-start;gap:8px;color:var(--ink);pointer-events:none}
+[data-header].hdr.scrolled{background:none;box-shadow:none;color:var(--ink)}
+[data-header].hdr.hidden{transform:none}
+.hdr a,.hdr button,.hdr .box{pointer-events:auto}
+/* the brand boxes tuck away on fast scroll down (ease-in, 0.26s) and return with the header timing (ease-out, 0.36s) */
+.brand{display:flex;align-items:flex-start;margin-right:auto;transition:transform .36s var(--ease-out),opacity .36s var(--ease-out)}
+.hdr.hidden .brand{transform:translate3d(0,-24px,0);opacity:0;pointer-events:none;transition-duration:.26s;transition-timing-function:var(--ease-in)}
+.hdr.hidden .brand *{pointer-events:none}
+/* logo box: the nav panel sits under the logo row and slides up behind it once scrolled
+   (transform + opacity only; it used to animate grid-template-rows, a layout property) */
+.bx-logo{position:relative;width:270px;isolation:isolate}
+.bx-top{position:relative;z-index:1;display:flex;padding:18px 20px 16px;box-shadow:inset 1px 0 0 var(--box-line),inset -1px 0 0 var(--box-line),inset 0 1px 0 var(--box-line)}
+.bx-top::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--box-line);opacity:0;transition:opacity var(--t-ui-exit) var(--ease-in)}
+.hdr.scrolled .bx-top::after{opacity:1;transition:opacity .12s var(--ease-out) .2s}
+.bx-top .logo{display:block}
+.bx-top .logo svg{height:18px;width:auto;display:block}
+.bnav{position:absolute;z-index:0;left:0;right:0;top:100%;padding:12px 20px 16px;background:var(--box);box-shadow:inset 1px 0 0 var(--box-line),inset -1px 0 0 var(--box-line),inset 0 -1px 0 var(--box-line);transition:transform .36s var(--ease-out),opacity .36s var(--ease-out)}
+.bnav>nav{display:flex;flex-direction:column;font-size:13px;line-height:26px}
+.hdr .bnav{pointer-events:auto}
+.hdr.scrolled .bnav{transform:translate3d(0,-100%,0);opacity:0;visibility:hidden;pointer-events:none;transition:transform .26s var(--ease-in),opacity .26s var(--ease-in),visibility 0s .26s}
+.bx-sets{margin-left:-1px;height:54px;padding:0 20px;display:flex;align-items:center;font-size:13px}
+.tabs{display:flex}
+/* tab fill: the set you enter fills in --t-ui ease-out; the one you leave empties in --t-ui-exit ease-in */
+.tab{position:relative;display:flex;align-items:center;justify-content:center;height:44px;padding:0 18px;font-size:13px;white-space:nowrap;background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px var(--box-line);transition:background-color var(--t-ui-exit) var(--ease-in),color var(--t-ui-exit) var(--ease-in),box-shadow var(--t-ui-exit) var(--ease-in),transform var(--t-press) var(--ease-out)}
+.tab+.tab{margin-left:-1px}
+.tab:hover{background:var(--hover);color:var(--ink)}
+.tab[aria-current="true"]{z-index:1;background:var(--ink);color:#fff;box-shadow:inset 0 0 0 1px var(--ink)}
+.tab:hover,.tab[aria-current="true"]{transition:background-color var(--t-ui) var(--ease-out),color var(--t-ui) var(--ease-out),box-shadow var(--t-ui) var(--ease-out),transform var(--t-press) var(--ease-out)}
+.lang-g{display:flex;padding:0 4px}
+.mrow{display:none}
+.mrow .logo svg{height:16px;width:auto;display:block}
+.menu-btn{width:46px;height:46px;display:flex;align-items:center;justify-content:center;box-shadow:inset 1px 0 0 var(--box-line),inset 0 1px 0 var(--box-line),inset 0 -1px 0 var(--box-line)}
+
+/* boxes drop in one after another (8px fall + fade, 45ms apart). The entrance transition only applies until
+   .settled, so afterwards each box keeps its own hover/fill timing and the press scale works without a delay */
+.drop{--dd:calc(var(--k,0) * var(--stagger) + 120ms)}
+html.js .drop{opacity:0;transform:translate3d(0,-8px,0)}
+html.js .hdr.on .drop{opacity:1;transform:none}
+html.js .hdr.on:not(.settled) .drop{transition:opacity .6s var(--ease-out) var(--dd),transform .9s var(--ease-out) var(--dd)}
+html.js .hdr.on a.drop:active{transform:scale(.97)}
+html.rm .drop{opacity:1!important;transform:none!important}
+
+/* ---------- hero ---------- */
+.hero{position:relative;height:clamp(640px,62.5vw,900px);overflow:hidden;background:#22252A;color:#fff}
+.hero .kb{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:50% 62%}
+.hero .scrim{position:absolute;left:0;right:0;bottom:0;height:440px;background:linear-gradient(to top,rgba(12,15,12,.62),rgba(12,15,12,0))}
+.hero-copy{position:absolute;left:var(--g);right:var(--g);bottom:56px;display:grid;grid-template-columns:minmax(0,600px) minmax(0,360px);column-gap:64px;align-items:end}
+.hero h1{font-size:56px;line-height:1.02;letter-spacing:-.028em;max-width:560px}
+.hero-side{display:flex;flex-direction:column;align-items:flex-start;gap:20px;padding-bottom:4px}
+.hero-side p{max-width:22em}
+.hero-side .cta{display:flex}
+
+/* ---------- shared two-column rows ---------- */
+.row{display:grid;grid-template-columns:var(--lc) minmax(0,1fr);column-gap:var(--cg);align-items:start;padding-left:var(--g);padding-right:var(--g)}
+.h2{font-size:32px;line-height:1.1;letter-spacing:-.02em}
+.sub{color:var(--sub)}
+.intro{padding-top:160px;align-items:end}
+.intro p{max-width:34em}
+
+/* ---------- a set ---------- */
+.set{padding-top:200px}
+#set-1{padding-top:120px}
+.set{scroll-margin-top:-80px}
+#set-1{scroll-margin-top:0}
+.set-l{position:sticky;top:120px;display:flex;flex-direction:column}
+.thumbs{display:flex;gap:8px}
+.thumbs img{width:64px;height:64px;object-fit:cover}
+.set h2{font-size:20px;line-height:1.3;letter-spacing:-.01em;font-weight:500;margin-top:28px}
+.set-l>p.sub{margin-top:6px}
+.pl{margin-top:24px;border-top:1px solid var(--line)}
+.pl li{padding:10px 0;border-bottom:1px solid var(--line);cursor:default;transition:color var(--t-ui-exit) var(--ease-in)}
+.pl .lt{color:var(--sub);display:inline-block;width:18px;transition:color var(--t-ui-exit) var(--ease-in)}
+.pl .nm{background-image:linear-gradient(currentColor,currentColor);background-size:0% 1px;background-position:0 100%;background-repeat:no-repeat;padding-bottom:2px;transition:background-size var(--t-ui-exit) var(--ease-in)}
+.choose{margin-top:28px}
+.offer{font-size:13px;color:var(--sub);margin-top:12px}
+
+/* scattered photos: desktop canvas measured on a 960px artboard */
+.canvas{position:relative;aspect-ratio:var(--car);box-sizing:content-box;padding-bottom:28px}
+.fig{position:absolute;top:0;left:var(--x);width:var(--w);margin-top:var(--y);transition:opacity var(--t-ui-exit) var(--ease-in)}
+.mk{display:block;font-size:13px;line-height:20px;min-height:20px;margin-bottom:8px;color:var(--sub);transition:color var(--t-ui-exit) var(--ease-in)}
+.mk .t{background-image:linear-gradient(currentColor,currentColor);background-size:0% 1px;background-position:0 100%;background-repeat:no-repeat;padding-bottom:1px;transition:background-size var(--t-ui-exit) var(--ease-in)}
+/* marker "types in" as its photo unmasks: an ivory cover shrinks off the text in one step per character,
+   140ms in all (transform only). The photo reveal itself is the engine's .rv-mask, triggered as it enters view */
+@supports selector(:has(a)){
+  html.js .mk .t{position:relative}
+  html.js .mk .t::after{content:"";position:absolute;left:-1px;right:-1px;top:0;bottom:0;background:var(--ivory);transform-origin:100% 50%;transition:transform 140ms steps(var(--n,3),start) var(--md,0ms)}
+  html.js .fig:has(.ph.in) .mk .t::after{transform:scaleX(0)}
+}
+.ph{position:relative;display:block;overflow:hidden;aspect-ratio:var(--ar);background:#22252A}
+.ph img{width:100%;height:100%;object-fit:cover;object-position:var(--op,50% 50%)}
+.ph .det{position:absolute;max-width:none;width:230%;height:230%;left:-65%;top:-35.1%}
+
+/* list <-> photo highlight */
+/* entering a highlight arrives in --t-ui ease-out; leaving it (un-hover) uses the shorter ease-in set above */
+.set.hl-on .fig,.set.hl-on .mk,.set.hl-on .mk .t,.set.hl-on .pl li,.set.hl-on .pl .lt,.set.hl-on .pl .nm{transition-duration:var(--t-ui);transition-timing-function:var(--ease-out)}
+.set.hl-on .fig:not(.hl){opacity:.6}
+.set .fig.hl .mk{color:var(--ink)}
+.set .fig.hl .mk .t{background-size:100% 1px}
+.set.hl-on .pl li:not(.hl){color:var(--sub)}
+.set .pl li.hl .lt{color:var(--ink)}
+.set .pl li.hl .nm{background-size:100% 1px}
+
+/* ---------- how it works ---------- */
+.how,.faq{padding-top:200px}
+.lead{display:flex;flex-direction:column;gap:10px}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:1px 0 0 1px}
+.steps li{min-height:148px;padding:20px 20px 22px;margin:-1px 0 0 -1px;display:flex;flex-direction:column;justify-content:space-between;gap:24px}
+.steps h3{font-size:20px;line-height:1.3;letter-spacing:-.01em}
+
+/* ---------- FAQ ---------- */
+.qa{border-top:1px solid var(--ink);max-width:760px}
+.qa details{border-bottom:1px solid var(--line)}
+.qa summary{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0}
+.qa summary svg{flex:none}
+.qa .acc-body p{padding:0 0 22px;color:var(--sub);max-width:36em}
+
+/* ---------- footer ---------- */
+.foot{margin:200px var(--g) 0;padding:0 0 36px}
+.foot hr{margin:0;border:0;height:1px;background:var(--line)}
+.foot-top{display:grid;grid-template-columns:var(--lc) minmax(0,1fr);column-gap:var(--cg);padding-top:56px;font-size:13px}
+.foot-top .logo svg{height:18px;width:auto;display:block}
+.cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:40px}
+.cols div{display:flex;flex-direction:column;gap:10px}
+.cols p{font-weight:500}
+.foot-b{display:flex;justify-content:space-between;gap:16px;margin-top:56px;font-size:13px;color:var(--sub)}
+.foot-b div{display:flex;gap:24px}
+.m-only{display:none}
+
+/* menu sheet */
+.m-top{display:flex;justify-content:space-between;align-items:center;min-height:46px;margin-bottom:24px}
+.m-top .logo svg{height:16px;width:auto;display:block}
+.m-close{width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+[data-menu] .btn{margin-top:auto;height:52px;font-size:15px}
+
+/* ---------- 1024-ish ---------- */
+@media (max-width:1180px){
+  :root{--lc:280px;--cg:48px}
+  .choose{padding:0 16px;gap:12px}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hero-copy{column-gap:40px}
+}
+
+/* ---------- tablet + mobile: stacked sets, mobile header ---------- */
+@media (max-width:900px){
+  [data-header].hdr{height:101px;padding:12px 12px 0;flex-direction:column;gap:0;align-items:stretch}
+  [data-header].hdr.hidden{transform:translate3d(0,-57px,0)}
+  .brand,.hdr>.lang-g,.hdr>.btn{display:none}
+  .mrow{display:flex;align-items:center;justify-content:space-between;height:46px}
+  .mrow .logo{display:flex;align-items:center;min-height:44px;padding:0 14px}
+  .mrow .r{display:flex;align-items:center;height:46px}
+  .mrow .btn{height:46px;padding:0 14px}
+  .tabs{margin-top:-1px}
+  .tab{flex:1;padding:0}
+
+  .hero{height:720px}
+  .hero .kb{object-position:50% 58%}
+  .hero .scrim{height:380px;background:linear-gradient(to top,rgba(12,15,12,.66),rgba(12,15,12,0))}
+  .hero-copy{bottom:32px;display:flex;flex-direction:column;align-items:flex-start}
+  .hero-side{gap:0;padding:0}
+  .hero-side p{margin-top:16px;max-width:21em}
+  .hero-side .cta{margin-top:20px}
+
+  .row{display:block}
+  .intro{padding-top:96px}
+  .intro p{margin-top:12px}
+  .set,#set-1{padding-top:120px;scroll-margin-top:0}
+  #set-1{padding-top:72px}
+  .set-l{position:static;max-width:640px}
+  .set h2{margin-top:24px}
+  .set-l>p.sub{margin-top:4px}
+  .pl{margin-top:20px}
+  .choose{margin-top:24px}
+  .canvas{margin-top:40px;max-width:640px;aspect-ratio:auto;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:12px;align-items:start}
+  .fig{position:static;width:auto;margin:0;padding-top:var(--mpt,0px);grid-column:var(--mc,auto);grid-row:var(--mr,auto)}
+  .ph{aspect-ratio:var(--mar)}
+  .ph img{object-position:var(--mop,var(--op,50% 50%))}
+  .how,.faq{padding-top:120px}
+  .lead p{margin-top:2px}
+  .h2{font-size:28px}
+  .lead{gap:10px}
+  .steps{margin-top:24px;grid-template-columns:minmax(0,1fr);max-width:640px}
+  .steps li{min-height:0;padding:16px 18px;gap:4px;justify-content:flex-start}
+  .faq h2{margin-bottom:16px}
+  .qa summary{padding:0;min-height:56px}
+  .qa .acc-body p{padding-bottom:18px}
+  .foot{margin-top:120px;padding-bottom:28px}
+  .foot-top{display:block;padding-top:32px}
+  .foot-top>.logo{display:none}
+  .cols{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:20px;column-gap:16px;font-size:15px}
+  .cols div{gap:0}
+  .cols a{display:flex;align-items:center;min-height:44px}
+  .foot-b{margin-top:24px}
+  .d-only{display:none}
+  .m-only{display:inline}
+}
+@media (max-width:760px){
+  body{font-size:15px}
+  .hero h1{font-size:40px;line-height:1.04}
+}
+@media (max-width:380px){
+  .mrow .btn{padding:0 10px}
+  .lang{min-width:40px;padding:0 6px}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr" data-header="overlay">
+  <div class="brand">
+    <div class="bx-logo drop" style="--k:0">
+      <div class="box bx-top"><a class="logo" href="#top" aria-label="Iconec home"><svg viewBox="0 0 220 84.29" fill="currentColor" role="img" aria-label="Iconec"><path d="M2.039 82.958V10.407H0V9.074H10.749V10.407H8.71V82.958H10.749V84.291H0V82.958H2.039Z"></path><path d="M18.686 65.011V28.352C18.686 22.874 20.757 17.638 24.366 13.983C27.438 10.871 31.403 9.127 35.529 9.074H35.581C39.691 9.139 43.643 10.881 46.702 13.983C50.267 17.591 52.336 22.764 52.381 28.172V35.035H45.712V21.975C45.673 18.709 44.41 15.579 42.251 13.393C40.402 11.52 38.019 10.46 35.538 10.407C33.053 10.457 30.667 11.518 28.818 13.391C26.658 15.577 25.398 18.709 25.357 21.984V71.386C25.396 74.652 26.658 77.782 28.816 79.968C30.666 81.841 33.051 82.902 35.534 82.954C39.367 82.901 43.051 81.279 45.906 78.387C49.268 74.985 51.194 70.11 51.194 65.009V64.516H52.381V65.009C52.381 70.485 50.31 75.723 46.701 79.376C43.629 82.488 39.666 84.232 35.539 84.287H35.531L35.536 83.794L35.528 84.287C31.402 84.232 27.438 82.488 24.366 79.376C20.757 75.723 18.686 70.485 18.686 65.009V65.011Z"></path><path d="M107.554 9.074L133.984 80.292V14.861C133.889 13.653 133.399 12.533 132.601 11.706C131.793 10.868 130.743 10.407 129.642 10.407H129.202V9.074H137.208V10.407H135.17V84.291H128.696L102.266 13.073V78.501C102.361 79.71 102.851 80.83 103.649 81.657C104.457 82.495 105.507 82.956 106.608 82.956H107.048V84.289H99.042V82.956H101.08V10.407H99.042V9.074H107.554Z"></path><path d="M145.724 82.956V10.405H143.685V9.072H179.816V21.976H178.629V21.483C178.629 15.609 174.547 10.745 169.334 10.403H152.397V46.012H163.017C166.237 45.797 168.759 42.791 168.759 39.161V38.668H169.946V54.687H168.759V54.194C168.759 50.565 166.237 47.557 163.017 47.343H152.397V82.951H169.334C174.548 82.609 178.629 77.745 178.629 71.872V71.379H179.816V84.282H143.685V82.949H145.724V82.956Z"></path><path d="M186.303 65.011V28.352C186.303 22.874 188.374 17.638 191.984 13.983C195.055 10.871 199.02 9.127 203.147 9.074H203.199C207.308 9.139 211.26 10.881 214.32 13.983C217.884 17.591 219.953 22.764 219.998 28.172V35.035H213.329V21.975C213.29 18.709 212.028 15.579 209.868 13.393C208.021 11.52 205.636 10.46 203.155 10.407C200.67 10.457 198.284 11.518 196.433 13.391C194.274 15.577 193.013 18.709 192.973 21.984V71.386C193.011 74.652 194.274 77.782 196.433 79.968C198.283 81.841 200.669 82.902 203.152 82.954C206.984 82.901 210.668 81.279 213.523 78.387C216.885 74.985 218.811 70.11 218.811 65.009V64.516H219.998V65.009C219.998 70.485 217.928 75.723 214.318 79.376C211.246 82.488 207.283 84.232 203.157 84.287H203.148L203.152 83.794L203.143 84.287C199.017 84.232 195.054 82.488 191.982 79.376C188.372 75.723 186.302 70.485 186.302 65.009L186.303 65.011Z"></path><g transform="translate(58.82 0) scale(0.52775)"><path d="M36.942 17.629C40.341 13.429 47.362 5.086 47.362 5.086V1.976H45.192V4.162C45.192 4.162 34.594 17.251 34.591 17.254V19.989C38.343 20.638 41.949 22.506 44.805 25.397C48.897 29.54 51.286 35.471 51.362 41.66V135.269C51.289 141.474 48.897 147.408 44.805 151.551C41.297 155.103 36.773 157.114 32.065 157.209H31.938C27.23 157.114 22.706 155.103 19.198 151.551C15.107 147.408 12.717 141.477 12.641 135.288V41.675C12.714 35.471 15.107 29.536 19.198 25.393C22.188 22.366 26.067 20.46 30.016 19.904V17.264L19.373 4.159V1.973H17.203V5.083C17.203 5.083 24.294 13.416 27.69 17.585C21.692 18.503 16.295 21.264 11.618 25.676C11.329 25.95 11.046 26.226 10.764 26.512C3.924 33.438 0 43.362 0 53.742V123.203C0 133.582 3.924 143.504 10.764 150.429C16.584 156.326 24.094 159.63 31.919 159.735H32.011H32.09C39.906 159.63 47.416 156.326 53.236 150.429C60.076 143.507 64 133.582 64 123.206V53.742C64 43.362 60.076 33.441 53.236 26.515C48.541 21.759 43.111 18.693 36.945 17.629"></path><path d="M40.656 0.016H23.869L21.486 4.159L32.297 17.222L43.051 4.159L40.656 0.016ZM31.185 12.486L23.973 3.854L25.101 2.002H31.185V12.486ZM33.364 12.486V2.002H39.448L40.576 3.854L33.364 12.486Z"></path></g></svg></a></div>
+      <div class="bnav"><nav aria-label="Main"><a href="#pieces">Pieces</a><a href="#about">About</a></nav></div>
+    </div>
+    <a class="box bx-sets drop press" style="--k:1" href="#sets">The sets</a>
+  </div>
+  <div class="box mrow drop" style="--k:0">
+    <a class="logo" href="#top" aria-label="Iconec home"><svg viewBox="0 0 220 84.29" fill="currentColor" role="img" aria-label="Iconec"><path d="M2.039 82.958V10.407H0V9.074H10.749V10.407H8.71V82.958H10.749V84.291H0V82.958H2.039Z"></path><path d="M18.686 65.011V28.352C18.686 22.874 20.757 17.638 24.366 13.983C27.438 10.871 31.403 9.127 35.529 9.074H35.581C39.691 9.139 43.643 10.881 46.702 13.983C50.267 17.591 52.336 22.764 52.381 28.172V35.035H45.712V21.975C45.673 18.709 44.41 15.579 42.251 13.393C40.402 11.52 38.019 10.46 35.538 10.407C33.053 10.457 30.667 11.518 28.818 13.391C26.658 15.577 25.398 18.709 25.357 21.984V71.386C25.396 74.652 26.658 77.782 28.816 79.968C30.666 81.841 33.051 82.902 35.534 82.954C39.367 82.901 43.051 81.279 45.906 78.387C49.268 74.985 51.194 70.11 51.194 65.009V64.516H52.381V65.009C52.381 70.485 50.31 75.723 46.701 79.376C43.629 82.488 39.666 84.232 35.539 84.287H35.531L35.536 83.794L35.528 84.287C31.402 84.232 27.438 82.488 24.366 79.376C20.757 75.723 18.686 70.485 18.686 65.009V65.011Z"></path><path d="M107.554 9.074L133.984 80.292V14.861C133.889 13.653 133.399 12.533 132.601 11.706C131.793 10.868 130.743 10.407 129.642 10.407H129.202V9.074H137.208V10.407H135.17V84.291H128.696L102.266 13.073V78.501C102.361 79.71 102.851 80.83 103.649 81.657C104.457 82.495 105.507 82.956 106.608 82.956H107.048V84.289H99.042V82.956H101.08V10.407H99.042V9.074H107.554Z"></path><path d="M145.724 82.956V10.405H143.685V9.072H179.816V21.976H178.629V21.483C178.629 15.609 174.547 10.745 169.334 10.403H152.397V46.012H163.017C166.237 45.797 168.759 42.791 168.759 39.161V38.668H169.946V54.687H168.759V54.194C168.759 50.565 166.237 47.557 163.017 47.343H152.397V82.951H169.334C174.548 82.609 178.629 77.745 178.629 71.872V71.379H179.816V84.282H143.685V82.949H145.724V82.956Z"></path><path d="M186.303 65.011V28.352C186.303 22.874 188.374 17.638 191.984 13.983C195.055 10.871 199.02 9.127 203.147 9.074H203.199C207.308 9.139 211.26 10.881 214.32 13.983C217.884 17.591 219.953 22.764 219.998 28.172V35.035H213.329V21.975C213.29 18.709 212.028 15.579 209.868 13.393C208.021 11.52 205.636 10.46 203.155 10.407C200.67 10.457 198.284 11.518 196.433 13.391C194.274 15.577 193.013 18.709 192.973 21.984V71.386C193.011 74.652 194.274 77.782 196.433 79.968C198.283 81.841 200.669 82.902 203.152 82.954C206.984 82.901 210.668 81.279 213.523 78.387C216.885 74.985 218.811 70.11 218.811 65.009V64.516H219.998V65.009C219.998 70.485 217.928 75.723 214.318 79.376C211.246 82.488 207.283 84.232 203.157 84.287H203.148L203.152 83.794L203.143 84.287C199.017 84.232 195.054 82.488 191.982 79.376C188.372 75.723 186.302 70.485 186.302 65.009L186.303 65.011Z"></path><g transform="translate(58.82 0) scale(0.52775)"><path d="M36.942 17.629C40.341 13.429 47.362 5.086 47.362 5.086V1.976H45.192V4.162C45.192 4.162 34.594 17.251 34.591 17.254V19.989C38.343 20.638 41.949 22.506 44.805 25.397C48.897 29.54 51.286 35.471 51.362 41.66V135.269C51.289 141.474 48.897 147.408 44.805 151.551C41.297 155.103 36.773 157.114 32.065 157.209H31.938C27.23 157.114 22.706 155.103 19.198 151.551C15.107 147.408 12.717 141.477 12.641 135.288V41.675C12.714 35.471 15.107 29.536 19.198 25.393C22.188 22.366 26.067 20.46 30.016 19.904V17.264L19.373 4.159V1.973H17.203V5.083C17.203 5.083 24.294 13.416 27.69 17.585C21.692 18.503 16.295 21.264 11.618 25.676C11.329 25.95 11.046 26.226 10.764 26.512C3.924 33.438 0 43.362 0 53.742V123.203C0 133.582 3.924 143.504 10.764 150.429C16.584 156.326 24.094 159.63 31.919 159.735H32.011H32.09C39.906 159.63 47.416 156.326 53.236 150.429C60.076 143.507 64 133.582 64 123.206V53.742C64 43.362 60.076 33.441 53.236 26.515C48.541 21.759 43.111 18.693 36.945 17.629"></path><path d="M40.656 0.016H23.869L21.486 4.159L32.297 17.222L43.051 4.159L40.656 0.016ZM31.185 12.486L23.973 3.854L25.101 2.002H31.185V12.486ZM33.364 12.486V2.002H39.448L40.576 3.854L33.364 12.486Z"></path></g></svg></a>
+    <div class="r">
+      <div role="group" aria-label="Language" data-lang style="display:flex">
+        <button class="lang" type="button" aria-pressed="true">EN</button>
+        <button class="lang" type="button" aria-pressed="false" lang="ar">ع</button>
+      </div>
+      <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" data-menu-open><svg aria-hidden="true" width="20" height="20" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M3 8h16"/><path d="M3 14h16"/></svg></button>
+      <a class="btn" href="#join">Become a member</a>
+    </div>
+  </div>
+  <nav class="tabs" aria-label="Sets" data-note="Signature: these set tabs follow your scroll. The set you're in fills ink with white text (0.24s); click one to glide to that set.">
+    <a class="tab drop press" style="--k:2" href="#set-1" data-spy="set-1">1-piece set</a>
+    <a class="tab drop press" style="--k:3" href="#set-2" data-spy="set-2">2-piece set</a>
+    <a class="tab drop press" style="--k:4" href="#set-3" data-spy="set-3">3-piece set</a>
+  </nav>
+  <div class="box lang-g drop" style="--k:5" role="group" aria-label="Language" data-lang>
+    <button class="lang" type="button" aria-pressed="true">EN</button>
+    <button class="lang" type="button" aria-pressed="false" lang="ar">ع</button>
+  </div>
+  <a class="btn drop" style="--k:6" href="#join">Become a member</a>
+</header>
+
+<div data-menu aria-label="Menu">
+  <div class="m-top">
+    <a class="logo" href="#top" aria-label="Iconec home"><svg viewBox="0 0 220 84.29" fill="currentColor" role="img" aria-label="Iconec"><path d="M2.039 82.958V10.407H0V9.074H10.749V10.407H8.71V82.958H10.749V84.291H0V82.958H2.039Z"></path><path d="M18.686 65.011V28.352C18.686 22.874 20.757 17.638 24.366 13.983C27.438 10.871 31.403 9.127 35.529 9.074H35.581C39.691 9.139 43.643 10.881 46.702 13.983C50.267 17.591 52.336 22.764 52.381 28.172V35.035H45.712V21.975C45.673 18.709 44.41 15.579 42.251 13.393C40.402 11.52 38.019 10.46 35.538 10.407C33.053 10.457 30.667 11.518 28.818 13.391C26.658 15.577 25.398 18.709 25.357 21.984V71.386C25.396 74.652 26.658 77.782 28.816 79.968C30.666 81.841 33.051 82.902 35.534 82.954C39.367 82.901 43.051 81.279 45.906 78.387C49.268 74.985 51.194 70.11 51.194 65.009V64.516H52.381V65.009C52.381 70.485 50.31 75.723 46.701 79.376C43.629 82.488 39.666 84.232 35.539 84.287H35.531L35.536 83.794L35.528 84.287C31.402 84.232 27.438 82.488 24.366 79.376C20.757 75.723 18.686 70.485 18.686 65.009V65.011Z"></path><path d="M107.554 9.074L133.984 80.292V14.861C133.889 13.653 133.399 12.533 132.601 11.706C131.793 10.868 130.743 10.407 129.642 10.407H129.202V9.074H137.208V10.407H135.17V84.291H128.696L102.266 13.073V78.501C102.361 79.71 102.851 80.83 103.649 81.657C104.457 82.495 105.507 82.956 106.608 82.956H107.048V84.289H99.042V82.956H101.08V10.407H99.042V9.074H107.554Z"></path><path d="M145.724 82.956V10.405H143.685V9.072H179.816V21.976H178.629V21.483C178.629 15.609 174.547 10.745 169.334 10.403H152.397V46.012H163.017C166.237 45.797 168.759 42.791 168.759 39.161V38.668H169.946V54.687H168.759V54.194C168.759 50.565 166.237 47.557 163.017 47.343H152.397V82.951H169.334C174.548 82.609 178.629 77.745 178.629 71.872V71.379H179.816V84.282H143.685V82.949H145.724V82.956Z"></path><path d="M186.303 65.011V28.352C186.303 22.874 188.374 17.638 191.984 13.983C195.055 10.871 199.02 9.127 203.147 9.074H203.199C207.308 9.139 211.26 10.881 214.32 13.983C217.884 17.591 219.953 22.764 219.998 28.172V35.035H213.329V21.975C213.29 18.709 212.028 15.579 209.868 13.393C208.021 11.52 205.636 10.46 203.155 10.407C200.67 10.457 198.284 11.518 196.433 13.391C194.274 15.577 193.013 18.709 192.973 21.984V71.386C193.011 74.652 194.274 77.782 196.433 79.968C198.283 81.841 200.669 82.902 203.152 82.954C206.984 82.901 210.668 81.279 213.523 78.387C216.885 74.985 218.811 70.11 218.811 65.009V64.516H219.998V65.009C219.998 70.485 217.928 75.723 214.318 79.376C211.246 82.488 207.283 84.232 203.157 84.287H203.148L203.152 83.794L203.143 84.287C199.017 84.232 195.054 82.488 191.982 79.376C188.372 75.723 186.302 70.485 186.302 65.009L186.303 65.011Z"></path><g transform="translate(58.82 0) scale(0.52775)"><path d="M36.942 17.629C40.341 13.429 47.362 5.086 47.362 5.086V1.976H45.192V4.162C45.192 4.162 34.594 17.251 34.591 17.254V19.989C38.343 20.638 41.949 22.506 44.805 25.397C48.897 29.54 51.286 35.471 51.362 41.66V135.269C51.289 141.474 48.897 147.408 44.805 151.551C41.297 155.103 36.773 157.114 32.065 157.209H31.938C27.23 157.114 22.706 155.103 19.198 151.551C15.107 147.408 12.717 141.477 12.641 135.288V41.675C12.714 35.471 15.107 29.536 19.198 25.393C22.188 22.366 26.067 20.46 30.016 19.904V17.264L19.373 4.159V1.973H17.203V5.083C17.203 5.083 24.294 13.416 27.69 17.585C21.692 18.503 16.295 21.264 11.618 25.676C11.329 25.95 11.046 26.226 10.764 26.512C3.924 33.438 0 43.362 0 53.742V123.203C0 133.582 3.924 143.504 10.764 150.429C16.584 156.326 24.094 159.63 31.919 159.735H32.011H32.09C39.906 159.63 47.416 156.326 53.236 150.429C60.076 143.507 64 133.582 64 123.206V53.742C64 43.362 60.076 33.441 53.236 26.515C48.541 21.759 43.111 18.693 36.945 17.629"></path><path d="M40.656 0.016H23.869L21.486 4.159L32.297 17.222L43.051 4.159L40.656 0.016ZM31.185 12.486L23.973 3.854L25.101 2.002H31.185V12.486ZM33.364 12.486V2.002H39.448L40.576 3.854L33.364 12.486Z"></path></g></svg></a>
+    <button class="m-close" type="button" aria-label="Close menu" data-menu-close><svg aria-hidden="true" width="20" height="20" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M5 5l12 12"/><path d="M17 5L5 17"/></svg></button>
+  </div>
+  <nav class="m-links" aria-label="Main">
+    <a href="#sets">The sets</a>
+    <a href="#pieces">Pieces</a>
+    <a href="#how">How it works</a>
+    <a href="#faq">Questions</a>
+    <a href="#about">About</a>
+  </nav>
+  <a class="btn" href="#join">Become a member</a>
+</div>
+
+<main>
+<section class="hero" id="top" data-hero data-note="Boxes drop in 45ms apart (8px) as the headline rises line by line and the photo settles from a slow zoom (2.2s).">
+  <img decoding="async" fetchpriority="high" class="kb" src="shot-earrings.jpg" alt="A pair of diamond drop earrings in 18k gold on dark slate">
+  <div class="scrim" aria-hidden="true"></div>
+  <div class="hero-copy">
+    <h1><span class="h-line"><span>Real diamonds,</span></span><span class="h-line"><span>on rotation.</span></span></h1>
+    <div class="hero-side">
+      <p data-hero-fade style="--d:450ms">Hold up to three pieces of 18k gold and IGI-certified diamonds. Swap from day 2. Never buy.</p>
+      <div class="cta" data-hero-fade style="--d:500ms"><a class="btn-w press" href="#sets">See the sets</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="row intro" id="sets" data-note="Heading, then the intro line 50ms later, rise in as they enter (0.9s).">
+  <h2 class="h2" data-reveal>The sets</h2>
+  <p class="sub" data-reveal style="--d:50ms">Three ways to hold real diamonds: one, two or three pieces at a time. The pieces shown are examples. You pick your own.</p>
+</section>
+
+<section class="row set" id="set-1" aria-labelledby="set-1-t" data-note="Left column stays pinned while the photos scroll past. Each marker types in (0.14s) as its photo unmasks (1.1s); hover a list line to spotlight its photo (0.24s).">
+  <div class="set-l">
+    <ul class="thumbs" aria-label="Pieces in this set" data-reveal="fade">
+      <li><img loading="lazy" decoding="async" src="ring.jpg" alt="" style="object-position:50% 19%"></li>
+    </ul>
+    <h2 id="set-1-t" data-reveal>The 1-piece set</h2>
+    <p class="sub" data-reveal>Hold one piece at a time. Swap it from day 2.</p>
+    <ol class="pl" data-reveal>
+      <li data-k="a"><span class="lt">a.</span><span class="nm">The Ivy, ring</span></li>
+    </ol>
+    <div data-reveal><a class="choose num press" href="#join-1"><span>Choose this set</span><span>AED 299 a month</span></a></div>
+    <p class="offer" data-reveal>Your first AED 299 is on us.</p>
+  </div>
+  <div class="canvas" style="--car:960/650">
+    <figure class="fig" data-k="a" style="--x:12.5%;--y:0%;--w:54.1667%;--ar:520/650;--op:50% 5%;--mar:169/260;--mop:50% 0%">
+      <figcaption class="mk"><span class="t">(a)</span></figcaption>
+      <span class="ph" data-reveal="img"><img loading="lazy" decoding="async" src="ring.jpg" alt="The Ivy, an 18k gold ring with diamonds, on dark slate"></span>
+    </figure>
+    <figure class="fig" data-k="a" style="--x:75%;--y:42.7083%;--w:25%;--ar:1/1;--mar:1/1;--mpt:96px">
+      <figcaption class="mk"><span class="t">(a) detail</span></figcaption>
+      <span class="ph" data-reveal="img"><img loading="lazy" decoding="async" class="det" src="ring.jpg" alt="Close view of the diamonds on The Ivy"></span>
+    </figure>
+  </div>
+</section>
+
+<section class="row set" id="set-2" aria-labelledby="set-2-t" data-note="Same rhythm: (a), then (b) 50ms later or as it scrolls in. Photos dim to 60% except the one you point at (0.24s).">
+  <div class="set-l">
+    <ul class="thumbs" aria-label="Pieces in this set" data-reveal="fade">
+      <li><img loading="lazy" decoding="async" src="riviere.jpg" alt=""></li>
+      <li><img loading="lazy" decoding="async" src="pendant.jpg" alt=""></li>
+    </ul>
+    <h2 id="set-2-t" data-reveal>The 2-piece set</h2>
+    <p class="sub" data-reveal>Hold two at a time. Swap either from day 2.</p>
+    <ol class="pl" data-reveal>
+      <li data-k="a"><span class="lt">a.</span><span class="nm">The Windfall, necklace</span></li>
+      <li data-k="b"><span class="lt">b.</span><span class="nm">Piece name, pendant</span></li>
+    </ol>
+    <div data-reveal><a class="choose num press" href="#join-2"><span>Choose this set</span><span>AED 450 a month</span></a></div>
+  </div>
+  <div class="canvas" style="--car:960/730">
+    <figure class="fig" data-k="a" style="--x:0%;--y:0%;--w:43.75%;--ar:420/525;--mar:169/212">
+      <figcaption class="mk"><span class="t">(a)</span></figcaption>
+      <span class="ph" data-reveal="img"><img loading="lazy" decoding="async" src="riviere.jpg" alt="The Windfall, a two-row diamond necklace in 18k gold, on dark slate"></span>
+    </figure>
+    <figure class="fig" data-k="b" style="--x:54.1667%;--y:18.75%;--w:45.8333%;--ar:440/550;--mar:169/212;--mpt:72px">
+      <figcaption class="mk"><span class="t">(b)</span></figcaption>
+      <span class="ph" data-reveal="img"><img loading="lazy" decoding="async" src="pendant.jpg" alt="A diamond leaf pendant in 18k gold with a red drop, on dark slate"></span>
+    </figure>
+  </div>
+</section>
+
+<section class="row set" id="set-3" aria-labelledby="set-3-t" data-note="Photos unmask in letter order a, b, c (50ms apart, or each as it enters), each marker typing in as its photo starts.">
+  <div class="set-l">
+    <ul class="thumbs" aria-label="Pieces in this set" data-reveal="fade">
+      <li><img loading="lazy" decoding="async" src="ring.jpg" alt="" style="object-position:50% 19%"></li>
+      <li><img loading="lazy" decoding="async" src="riviere.jpg" alt=""></li>
+      <li><img loading="lazy" decoding="async" src="shot-earrings.jpg" alt="" style="object-position:50% 45%"></li>
+    </ul>
+    <h2 id="set-3-t" data-reveal>The 3-piece set</h2>
+    <p class="sub" data-reveal>Hold three at a time. Swap any from day 2.</p>
+    <ol class="pl" data-reveal>
+      <li data-k="a"><span class="lt">a.</span><span class="nm">The Ivy, ring</span></li>
+      <li data-k="b"><span class="lt">b.</span><span class="nm">The Windfall, necklace</span></li>
+      <li data-k="c"><span class="lt">c.</span><span class="nm">Piece name, earrings</span></li>
+    </ol>
+    <div data-reveal><a class="choose num press" href="#join-3"><span>Choose this set</span><span>AED 599 a month</span></a></div>
+  </div>
+  <div class="canvas" style="--car:960/913">
+    <figure class="fig" data-k="a" style="--x:6.25%;--y:0%;--w:29.1667%;--ar:280/360;--op:50% 1%;--mar:169/212;--mop:50% 4%;--mc:1;--mr:1">
+      <figcaption class="mk"><span class="t">(a)</span></figcaption>
+      <span class="ph" data-reveal="img"><img loading="lazy" decoding="async" src="ring.jpg" alt="The Ivy, an 18k gold ring with diamonds, on dark slate"></span>
+    </figure>
+    <figure class="fig" data-k="b" style="--x:43.75%;--y:9.375%;--w:56.25%;--ar:540/675;--mar:169/260;--mpt:96px;--mc:2;--mr:1/span 2">
+      <figcaption class="mk"><span class="t">(b)</span></figcaption>
+      <span class="ph" data-reveal="img"><img loading="lazy" decoding="async" src="riviere.jpg" alt="The Windfall, a two-row diamond necklace in 18k gold, on dark slate"></span>
+    </figure>
+    <figure class="fig" data-k="c" style="--x:0%;--y:50.8333%;--w:35.4167%;--ar:340/425;--mar:169/212;--mpt:24px;--mc:1;--mr:2">
+      <figcaption class="mk"><span class="t">(c)</span></figcaption>
+      <span class="ph" data-reveal="img"><img loading="lazy" decoding="async" src="shot-earrings.jpg" alt="Diamond drop earrings in 18k gold, on dark slate"></span>
+    </figure>
+  </div>
+</section>
+
+<section class="row how" id="how" data-note="Heading rises, then the four boxes stagger in left to right, 45ms apart.">
+  <div class="lead">
+    <h2 class="h2" data-reveal>How it works</h2>
+    <p class="sub" data-reveal style="--d:50ms">Join on the website. No waitlist, no approval.</p>
+  </div>
+  <ol class="steps" data-stagger>
+    <li class="box" data-reveal><h3>Choose a set</h3><p class="sub num">1, 2 or 3 pieces, from AED 299 a month.</p></li>
+    <li class="box" data-reveal><h3>Pick your pieces</h3><p class="sub">18k gold and IGI-certified diamonds.</p></li>
+    <li class="box" data-reveal><h3>Set a delivery</h3><p class="sub">Choose where and when it arrives.</p></li>
+    <li class="box" data-reveal><h3>Swap from day 2</h3><p class="sub">Due back by day 30, or extend by 30 days.</p></li>
+  </ol>
+</section>
+
+<section class="row faq" id="faq" data-note="Questions rise in; answers open in 0.28s and close in 0.2s while the plus turns to a minus.">
+  <div class="lead">
+    <h2 class="h2" data-reveal>Questions</h2>
+    <p class="sub d-only" data-reveal style="--d:50ms">Can't find yours? <a class="lnk" href="#contact">Contact us</a></p>
+  </div>
+  <div class="qa" data-reveal>
+    <details class="acc" open><summary>Who can become a member?<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 8h12"/><path class="plus-v" d="M8 2v12"/></svg></summary><div class="acc-body"><p>Anyone can join on the website. Choose a set, pick your pieces and set a delivery. There is no waitlist and no approval.</p></div></details>
+    <details class="acc"><summary>Do I ever have to buy a piece?<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 8h12"/><path class="plus-v" d="M8 2v12"/></svg></summary><div class="acc-body"><p>No. You hold, wear and swap. Nothing to buy.</p></div></details>
+    <details class="acc"><summary>What happens on day 30?<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 8h12"/><path class="plus-v" d="M8 2v12"/></svg></summary><div class="acc-body"><p>Pieces are due back by day 30. You can extend any piece by 30 days.</p></div></details>
+    <details class="acc"><summary>What if a piece is lost or damaged?<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 8h12"/><path class="plus-v" d="M8 2v12"/></svg></summary><div class="acc-body"><p>[Answer placeholder: cover, deposit and what happens next.]</p></div></details>
+  </div>
+</section>
+</main>
+
+<footer class="foot" data-note="The top hairline draws left to right (0.9s), then the link columns fade up 45ms apart.">
+  <hr data-reveal="rule">
+  <div class="foot-top">
+    <a class="logo" href="#top" aria-label="Iconec home" data-reveal="fade"><svg viewBox="0 0 220 84.29" fill="currentColor" role="img" aria-label="Iconec"><path d="M2.039 82.958V10.407H0V9.074H10.749V10.407H8.71V82.958H10.749V84.291H0V82.958H2.039Z"></path><path d="M18.686 65.011V28.352C18.686 22.874 20.757 17.638 24.366 13.983C27.438 10.871 31.403 9.127 35.529 9.074H35.581C39.691 9.139 43.643 10.881 46.702 13.983C50.267 17.591 52.336 22.764 52.381 28.172V35.035H45.712V21.975C45.673 18.709 44.41 15.579 42.251 13.393C40.402 11.52 38.019 10.46 35.538 10.407C33.053 10.457 30.667 11.518 28.818 13.391C26.658 15.577 25.398 18.709 25.357 21.984V71.386C25.396 74.652 26.658 77.782 28.816 79.968C30.666 81.841 33.051 82.902 35.534 82.954C39.367 82.901 43.051 81.279 45.906 78.387C49.268 74.985 51.194 70.11 51.194 65.009V64.516H52.381V65.009C52.381 70.485 50.31 75.723 46.701 79.376C43.629 82.488 39.666 84.232 35.539 84.287H35.531L35.536 83.794L35.528 84.287C31.402 84.232 27.438 82.488 24.366 79.376C20.757 75.723 18.686 70.485 18.686 65.009V65.011Z"></path><path d="M107.554 9.074L133.984 80.292V14.861C133.889 13.653 133.399 12.533 132.601 11.706C131.793 10.868 130.743 10.407 129.642 10.407H129.202V9.074H137.208V10.407H135.17V84.291H128.696L102.266 13.073V78.501C102.361 79.71 102.851 80.83 103.649 81.657C104.457 82.495 105.507 82.956 106.608 82.956H107.048V84.289H99.042V82.956H101.08V10.407H99.042V9.074H107.554Z"></path><path d="M145.724 82.956V10.405H143.685V9.072H179.816V21.976H178.629V21.483C178.629 15.609 174.547 10.745 169.334 10.403H152.397V46.012H163.017C166.237 45.797 168.759 42.791 168.759 39.161V38.668H169.946V54.687H168.759V54.194C168.759 50.565 166.237 47.557 163.017 47.343H152.397V82.951H169.334C174.548 82.609 178.629 77.745 178.629 71.872V71.379H179.816V84.282H143.685V82.949H145.724V82.956Z"></path><path d="M186.303 65.011V28.352C186.303 22.874 188.374 17.638 191.984 13.983C195.055 10.871 199.02 9.127 203.147 9.074H203.199C207.308 9.139 211.26 10.881 214.32 13.983C217.884 17.591 219.953 22.764 219.998 28.172V35.035H213.329V21.975C213.29 18.709 212.028 15.579 209.868 13.393C208.021 11.52 205.636 10.46 203.155 10.407C200.67 10.457 198.284 11.518 196.433 13.391C194.274 15.577 193.013 18.709 192.973 21.984V71.386C193.011 74.652 194.274 77.782 196.433 79.968C198.283 81.841 200.669 82.902 203.152 82.954C206.984 82.901 210.668 81.279 213.523 78.387C216.885 74.985 218.811 70.11 218.811 65.009V64.516H219.998V65.009C219.998 70.485 217.928 75.723 214.318 79.376C211.246 82.488 207.283 84.232 203.157 84.287H203.148L203.152 83.794L203.143 84.287C199.017 84.232 195.054 82.488 191.982 79.376C188.372 75.723 186.302 70.485 186.302 65.009L186.303 65.011Z"></path><g transform="translate(58.82 0) scale(0.52775)"><path d="M36.942 17.629C40.341 13.429 47.362 5.086 47.362 5.086V1.976H45.192V4.162C45.192 4.162 34.594 17.251 34.591 17.254V19.989C38.343 20.638 41.949 22.506 44.805 25.397C48.897 29.54 51.286 35.471 51.362 41.66V135.269C51.289 141.474 48.897 147.408 44.805 151.551C41.297 155.103 36.773 157.114 32.065 157.209H31.938C27.23 157.114 22.706 155.103 19.198 151.551C15.107 147.408 12.717 141.477 12.641 135.288V41.675C12.714 35.471 15.107 29.536 19.198 25.393C22.188 22.366 26.067 20.46 30.016 19.904V17.264L19.373 4.159V1.973H17.203V5.083C17.203 5.083 24.294 13.416 27.69 17.585C21.692 18.503 16.295 21.264 11.618 25.676C11.329 25.95 11.046 26.226 10.764 26.512C3.924 33.438 0 43.362 0 53.742V123.203C0 133.582 3.924 143.504 10.764 150.429C16.584 156.326 24.094 159.63 31.919 159.735H32.011H32.09C39.906 159.63 47.416 156.326 53.236 150.429C60.076 143.507 64 133.582 64 123.206V53.742C64 43.362 60.076 33.441 53.236 26.515C48.541 21.759 43.111 18.693 36.945 17.629"></path><path d="M40.656 0.016H23.869L21.486 4.159L32.297 17.222L43.051 4.159L40.656 0.016ZM31.185 12.486L23.973 3.854L25.101 2.002H31.185V12.486ZM33.364 12.486V2.002H39.448L40.576 3.854L33.364 12.486Z"></path></g></svg></a>
+    <div class="cols" data-stagger>
+      <div data-reveal><p>Pieces</p><a href="#r">Rings</a><a href="#n">Necklaces</a><a href="#e">Earrings</a></div>
+      <div data-reveal><p>Membership</p><a href="#how">How it works</a><a href="#sets">The sets</a><a href="#gift">Gifting</a></div>
+      <div data-reveal><p>Help</p><a href="#faq">Questions</a><a href="#contact">Contact</a><a href="#delivery"><span class="d-only">Delivery and returns</span><span class="m-only">Delivery</span></a></div>
+      <div data-reveal><p>Iconec</p><a href="#about">About</a><a href="#journal">Journal</a><a href="#ig">Instagram</a></div>
+    </div>
+  </div>
+  <div class="foot-b"><span>English · <span lang="ar">العربية</span><span class="m-only"> · UAE</span></span><div><span class="d-only">UAE · AED</span><span>© 2026 Iconec</span></div></div>
+</footer>
+
+<script src="motion.js"></script>
+<script>
+(function () {
+  var hdr = document.querySelector('.hdr');
+
+  /* floating boxes drop in after first paint; once the last one has landed (6 × 45ms + 120ms + 0.9s)
+     .settled hands each box back its own hover/fill/press timing */
+  requestAnimationFrame(function () { requestAnimationFrame(function () {
+    hdr.classList.add('on');
+    setTimeout(function () { hdr.classList.add('settled'); }, 1400);
+  }); });
+
+  /* scroll-spy: the set you're in fills ink in the floating tabs.
+     Lenis scrolls the window, so native (passive) scroll events still arrive; one rAF per frame,
+     all reads first, and the DOM is only written when the active set changes */
+  var tabs = [].slice.call(document.querySelectorAll('[data-spy]'));
+  var sets = tabs.map(function (t) { return document.getElementById(t.getAttribute('data-spy')); });
+  var ticking = false, current = null;
+  function spy() {
+    ticking = false;
+    var line = window.innerHeight * 0.45, active = -1;
+    var rects = sets.map(function (s) { return s.getBoundingClientRect(); });
+    rects.forEach(function (r, i) { if (r.top <= line && r.bottom > line) active = i; });
+    if (active === current) return;
+    current = active;
+    tabs.forEach(function (t, i) { if (i === active) t.setAttribute('aria-current', 'true'); else t.removeAttribute('aria-current'); });
+  }
+  function queue() { if (!ticking) { ticking = true; requestAnimationFrame(spy); } }
+  window.addEventListener('scroll', queue, { passive: true });
+  window.addEventListener('resize', queue);
+  spy();
+
+  /* tab click glides through the engine (Lenis on desktop). scroll-margin-top keeps the pinned column
+     landing at its sticky top (desktop sets use -80px), so it doubles as the scroll offset */
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function (e) {
+      e.preventDefault();
+      var m = parseFloat(getComputedStyle(sets[i]).scrollMarginTop) || 0;
+      window.iconecScrollTo(sets[i], { offset: -m });
+    });
+  });
+
+  sets.forEach(function (set) {
+    /* photos reveal through the engine as each enters view; when several enter together they go in
+       letter order 50ms apart, and each marker types in (one step per character, 140ms) as its photo starts */
+    [].slice.call(set.querySelectorAll('.fig')).forEach(function (fig, i) {
+      var t = fig.querySelector('.mk .t');
+      t.style.setProperty('--n', t.textContent.length);
+      fig.style.setProperty('--md', (i * 50) + 'ms');
+      fig.querySelector('.ph').style.setProperty('--d', (i * 50 + 100) + 'ms');
+    });
+
+    /* hover a list line to spotlight its photo, and the other way round */
+    var keyed = [].slice.call(set.querySelectorAll('[data-k]'));
+    function hl(k) {
+      set.classList.toggle('hl-on', !!k);
+      keyed.forEach(function (el) { el.classList.toggle('hl', !!k && el.getAttribute('data-k') === k); });
+    }
+    keyed.forEach(function (el) {
+      el.addEventListener('mouseenter', function () { hl(el.getAttribute('data-k')); });
+      el.addEventListener('mouseleave', function () { hl(null); });
+    });
+  });
+})();
+</script>
+</body>
+</html>

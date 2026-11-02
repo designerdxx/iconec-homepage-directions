@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Iconec · Homepage directions</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="base.css">
+<style>
+/* Launcher: a white gallery of the seven directions. Each tile expands into its page. */
+:root{--page:#FFFFFF;--tile:#F4F4F2;--tile-h:#EEEEEB;--ink:#141A14;--sub:#6B6F69;--g:12px;--r:20px}
+@view-transition{navigation:auto}
+body{background:var(--page);color:var(--ink)}
+.wrap{padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));container-type:inline-size}
+.hd{display:flex;align-items:center;gap:10px;height:64px;font-size:13px;color:var(--sub)}
+.hd svg{height:13px;width:auto;display:block;color:var(--ink)}
+.hd .sl{opacity:.5}
+.g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:var(--g);grid-auto-rows:calc((100cqw - 2 * var(--g)) / 60);grid-auto-flow:dense;padding-bottom:24px}
+.t{grid-column:var(--c);grid-row:span var(--s);padding-bottom:var(--g);display:block;color:inherit;text-decoration:none;-webkit-tap-highlight-color:transparent}
+.st{position:relative;display:flex;align-items:center;justify-content:center;height:100%;padding-bottom:40px;box-sizing:border-box;border-radius:var(--r);background:var(--tile);overflow:hidden;transition:background-color var(--t-ui) var(--ease-out),transform var(--t-press) var(--ease-out)}
+.t:active .st{transform:scale(.98)}
+.t:focus-visible{outline:none}
+.t:focus-visible .st{box-shadow:0 0 0 2px var(--page),0 0 0 4px var(--ink)}
+/* the desktop first screen inside each tile; tall tiles give it more air */
+.ob{position:relative;display:block;overflow:hidden;background:#ddd;box-shadow:0 1px 2px rgba(20,26,20,.06),0 18px 36px -18px rgba(20,26,20,.32);transition:transform var(--t-ui) var(--ease-out),opacity var(--t-ui) var(--ease-out)}
+.ob::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px rgba(20,26,20,.07);pointer-events:none}
+.ob img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 0}
+.ob{width:76%;aspect-ratio:16/10;border-radius:6px}
+.nm{position:absolute;left:12px;bottom:12px;padding:7px 11px;border-radius:999px;background:var(--page);font-size:12px;font-weight:500;line-height:1;letter-spacing:.005em;color:var(--ink);box-shadow:0 1px 2px rgba(20,26,20,.08)}
+@media (hover:hover){
+  .t:hover .st{background:var(--tile-h)}
+  .t:hover .ob{transform:scale(1.03)}
+}
+.away .ob{opacity:0;transform:scale(.97);transition:none}
+/* expand overlay */
+.xp{position:fixed;inset:0;z-index:100;pointer-events:none}
+.xp-st{position:absolute;inset:0;background:var(--tile)}
+.xp-pg{position:absolute;inset:0;opacity:0}
+.xp-ob{position:absolute;margin:0;box-shadow:0 1px 2px rgba(20,26,20,.06),0 18px 36px -18px rgba(20,26,20,.32)}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.24s;animation-timing-function:cubic-bezier(.16,1,.3,1)}
+@media (max-width:760px){
+  :root{--g:10px;--r:16px}
+  .wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .hd{height:56px}
+  .g{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:calc((100cqw - var(--g)) / 40)}
+  .t{grid-column:var(--mc);grid-row:span var(--ms)}
+  .st{padding-bottom:30px}
+  .ob{width:74%;border-radius:4px}
+  .nm{left:8px;bottom:8px;padding:6px 9px;font-size:11px}
+}
+@media (prefers-reduced-motion:reduce){::view-transition-old(root),::view-transition-new(root){animation:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header class="hd"><a href="index.html" aria-label="Iconec"><svg viewBox="0 0 220 84.29" fill="currentColor" aria-hidden="true"><path d="M2.039 82.958V10.407H0V9.074H10.749V10.407H8.71V82.958H10.749V84.291H0V82.958H2.039Z"/><path d="M18.686 65.011V28.352C18.686 22.874 20.757 17.638 24.366 13.983C27.438 10.871 31.403 9.127 35.529 9.074H35.581C39.691 9.139 43.643 10.881 46.702 13.983C50.267 17.591 52.336 22.764 52.381 28.172V35.035H45.712V21.975C45.673 18.709 44.41 15.579 42.251 13.393C40.402 11.52 38.019 10.46 35.538 10.407C33.053 10.457 30.667 11.518 28.818 13.391C26.658 15.577 25.398 18.709 25.357 21.984V71.386C25.396 74.652 26.658 77.782 28.816 79.968C30.666 81.841 33.051 82.902 35.534 82.954C39.367 82.901 43.051 81.279 45.906 78.387C49.268 74.985 51.194 70.11 51.194 65.009V64.516H52.381V65.009C52.381 70.485 50.31 75.723 46.701 79.376C43.629 82.488 39.666 84.232 35.539 84.287H35.531L35.536 83.794L35.528 84.287C31.402 84.232 27.438 82.488 24.366 79.376C20.757 75.723 18.686 70.485 18.686 65.009V65.011Z"/><path d="M107.554 9.074L133.984 80.292V14.861C133.889 13.653 133.399 12.533 132.601 11.706C131.793 10.868 130.743 10.407 129.642 10.407H129.202V9.074H137.208V10.407H135.17V84.291H128.696L102.266 13.073V78.501C102.361 79.71 102.851 80.83 103.649 81.657C104.457 82.495 105.507 82.956 106.608 82.956H107.048V84.289H99.042V82.956H101.08V10.407H99.042V9.074H107.554Z"/><path d="M145.724 82.956V10.405H143.685V9.072H179.816V21.976H178.629V21.483C178.629 15.609 174.547 10.745 169.334 10.403H152.397V46.012H163.017C166.237 45.797 168.759 42.791 168.759 39.161V38.668H169.946V54.687H168.759V54.194C168.759 50.565 166.237 47.557 163.017 47.343H152.397V82.951H169.334C174.548 82.609 178.629 77.745 178.629 71.872V71.379H179.816V84.282H143.685V82.949H145.724V82.956Z"/><path d="M186.303 65.011V28.352C186.303 22.874 188.374 17.638 191.984 13.983C195.055 10.871 199.02 9.127 203.147 9.074H203.199C207.308 9.139 211.26 10.881 214.32 13.983C217.884 17.591 219.953 22.764 219.998 28.172V35.035H213.329V21.975C213.29 18.709 212.028 15.579 209.868 13.393C208.021 11.52 205.636 10.46 203.155 10.407C200.67 10.457 198.284 11.518 196.433 13.391C194.274 15.577 193.013 18.709 192.973 21.984V71.386C193.011 74.652 194.274 77.782 196.433 79.968C198.283 81.841 200.669 82.902 203.152 82.954C206.984 82.901 210.668 81.279 213.523 78.387C216.885 74.985 218.811 70.11 218.811 65.009V64.516H219.998V65.009C219.998 70.485 217.928 75.723 214.318 79.376C211.246 82.488 207.283 84.232 203.157 84.287H203.148L203.152 83.794L203.143 84.287C199.017 84.232 195.054 82.488 191.982 79.376C188.372 75.723 186.302 70.485 186.302 65.009L186.303 65.011Z"/><g transform="translate(58.82 0) scale(0.52775)"><path d="M36.942 17.629C40.341 13.429 47.362 5.086 47.362 5.086V1.976H45.192V4.162C45.192 4.162 34.594 17.251 34.591 17.254V19.989C38.343 20.638 41.949 22.506 44.805 25.397C48.897 29.54 51.286 35.471 51.362 41.66V135.269C51.289 141.474 48.897 147.408 44.805 151.551C41.297 155.103 36.773 157.114 32.065 157.209H31.938C27.23 157.114 22.706 155.103 19.198 151.551C15.107 147.408 12.717 141.477 12.641 135.288V41.675C12.714 35.471 15.107 29.536 19.198 25.393C22.188 22.366 26.067 20.46 30.016 19.904V17.264L19.373 4.159V1.973H17.203V5.083C17.203 5.083 24.294 13.416 27.69 17.585C21.692 18.503 16.295 21.264 11.618 25.676C11.329 25.95 11.046 26.226 10.764 26.512C3.924 33.438 0 43.362 0 53.742V123.203C0 133.582 3.924 143.504 10.764 150.429C16.584 156.326 24.094 159.63 31.919 159.735H32.011H32.09C39.906 159.63 47.416 156.326 53.236 150.429C60.076 143.507 64 133.582 64 123.206V53.742C64 43.362 60.076 33.441 53.236 26.515C48.541 21.759 43.111 18.693 36.945 17.629"/><path d="M40.656 0.016H23.869L21.486 4.159L32.297 17.222L43.051 4.159L40.656 0.016ZM31.185 12.486L23.973 3.854L25.101 2.002H31.185V12.486ZM33.364 12.486V2.002H39.448L40.576 3.854L33.364 12.486Z"/></g></svg></a><span class="sl" aria-hidden="true">/</span><h1 style="font:inherit;color:inherit">Homepage directions</h1></header>
+
+<nav class="g" aria-label="Directions">
+<a class="t" href="vitrine.html" data-slug="vitrine" data-bg="#FFFFFF" style="--c:1;--mc:1;--s:24;--ms:20" aria-label="The Vitrine"><span class="st"><span class="ob"><img src="thumb-vitrine.jpg" alt="" width="960" height="600"></span><span class="nm" aria-hidden="true">The Vitrine</span></span></a>
+<a class="t" href="showroom.html" data-slug="showroom" data-bg="#F6F5F1" style="--c:2;--mc:2;--s:14;--ms:20" aria-label="The Showroom"><span class="st"><span class="ob"><img src="thumb-showroom.jpg" alt="" width="960" height="600"></span><span class="nm" aria-hidden="true">The Showroom</span></span></a>
+<a class="t" href="campaign.html" data-slug="campaign" data-bg="#FFFFFF" style="--c:3;--mc:1;--s:21;--ms:20" aria-label="The Campaign"><span class="st"><span class="ob"><img src="thumb-campaign.jpg" alt="" width="960" height="600"></span><span class="nm" aria-hidden="true">The Campaign</span></span></a>
+<a class="t" href="catalogue.html" data-slug="catalogue" data-bg="#F7F5F0" style="--c:2;--mc:2;--s:21;--ms:20" aria-label="The Catalogue"><span class="st"><span class="ob"><img src="thumb-catalogue.jpg" alt="" width="960" height="600"></span><span class="nm" aria-hidden="true">The Catalogue</span></span></a>
+<a class="t" href="everyday.html" data-slug="everyday" data-bg="#F3EEE6" style="--c:3;--mc:1;--s:14;--ms:20" aria-label="The Everyday"><span class="st"><span class="ob"><img src="thumb-everyday.jpg" alt="" width="960" height="600"></span><span class="nm" aria-hidden="true">The Everyday</span></span></a>
+<a class="t" href="maison.html" data-slug="maison" data-bg="#FFFFFF" style="--c:1;--mc:2;--s:25;--ms:20" aria-label="The Maison"><span class="st"><span class="ob"><img src="thumb-maison.jpg" alt="" width="960" height="600"></span><span class="nm" aria-hidden="true">The Maison</span></span></a>
+<a class="t" href="split.html" data-slug="split" data-bg="#F5F4F0" style="--c:2;--mc:1;--s:14;--ms:20" aria-label="The Split"><span class="st"><span class="ob"><img src="thumb-split.jpg" alt="" width="960" height="600"></span><span class="nm" aria-hidden="true">The Split</span></span></a>
+<a class="t" href="sets.html" data-slug="sets" data-bg="#FAF9F4" style="--c:3;--mc:2;--s:14;--ms:20" aria-label="The Sets"><span class="st"><span class="ob"><img src="thumb-sets.jpg" alt="" width="960" height="600"></span><span class="nm" aria-hidden="true">The Sets</span></span></a>
+</nav>
+</div>
+
+<script>
+/* Tile → page: the tile's grey stage grows to fill the screen in the page's own colour, then the page opens.
+   Coming back, the screen shrinks into the tile you left from. Visitor-triggered, so 300ms ease-out. */
+(function () {
+  var rm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var EO = 'cubic-bezier(.16,1,.3,1)';
+  var ss = { get: function (k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } },
+             set: function (k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} },
+             del: function (k) { try { sessionStorage.removeItem(k); } catch (e) {} } };
+  var grid = document.querySelector('.g');
+  var tiles = [].slice.call(grid.querySelectorAll('.t'));
+  var busy = false;
+  var FULL = 'inset(0px 0px 0px 0px round 0px)';
+  function inset(r) {
+    var rad = getComputedStyle(document.documentElement).getPropertyValue('--r').trim() || '20px';
+    return 'inset(' + r.top + 'px ' + (innerWidth - r.right) + 'px ' + (innerHeight - r.bottom) + 'px ' + r.left + 'px round ' + rad + ')';
+  }
+  function overlay(bg) {
+    var x = document.createElement('div'); x.className = 'xp'; x.setAttribute('aria-hidden', 'true');
+    x.innerHTML = '<div class="xp-st"><div class="xp-pg"></div></div>';
+    x.querySelector('.xp-pg').style.background = bg;
+    document.body.appendChild(x); return x;
+  }
+
+  grid.addEventListener('click', function (e) {
+    var a = e.target.closest('a.t');
+    if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    ss.set('iconec-y', String(window.scrollY)); ss.set('iconec-from', a.getAttribute('data-slug'));
+    if (rm) return;
+    e.preventDefault(); if (busy) return; busy = true;
+    var st = a.querySelector('.st'), ob = a.querySelector('.ob');
+    var r = st.getBoundingClientRect(), ro = ob.getBoundingClientRect();
+    var x = overlay(a.getAttribute('data-bg'));
+    var clone = ob.cloneNode(true); clone.className = 'ob xp-ob';
+    clone.style.cssText = 'left:' + ro.left + 'px;top:' + ro.top + 'px;width:' + ro.width + 'px;height:' + ro.height + 'px;border-radius:' + getComputedStyle(ob).borderRadius;
+    x.appendChild(clone);
+    a.classList.add('away');
+    var dx = (innerWidth / 2 - (ro.left + ro.width / 2)) * .3, dy = (innerHeight / 2 - (ro.top + ro.height / 2)) * .3;
+    x.firstChild.animate([{ clipPath: inset(r) }, { clipPath: FULL }], { duration: 300, easing: EO, fill: 'forwards' });
+    x.querySelector('.xp-pg').animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, delay: 100, easing: EO, fill: 'forwards' });
+    clone.animate([{ transform: 'none', opacity: 1 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(1.05)', opacity: 0 }], { duration: 220, easing: EO, fill: 'forwards' });
+    setTimeout(function () { location.href = a.href; }, 300);
+  });
+
+  /* back from a page: shrink into the tile it came from */
+  function back(x) {
+    tiles.forEach(function (t) { t.classList.remove('away'); });
+    var slug = ss.get('iconec-from'); ss.del('iconec-from');
+    var a = slug && grid.querySelector('[data-slug="' + slug + '"]');
+    if (!a || rm) { if (x) x.remove(); return !!a; }
+    if (x) x.querySelectorAll('.xp-ob').forEach(function (n) { n.remove(); });
+    else x = overlay(a.getAttribute('data-bg'));
+    x.querySelector('.xp-pg').getAnimations().forEach(function (an) { an.cancel(); });
+    x.firstChild.getAnimations().forEach(function (an) { an.cancel(); });
+    a.classList.add('away');
+    var r = a.querySelector('.st').getBoundingClientRect();
+    x.querySelector('.xp-pg').animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: EO, fill: 'forwards' });
+    x.firstChild.animate([{ clipPath: FULL }, { clipPath: inset(r) }], { duration: 300, easing: EO, fill: 'forwards' })
+      .finished.then(function () { a.classList.remove('away'); x.remove(); });
+    return true;
+  }
+  var y = parseInt(ss.get('iconec-y') || '0', 10);
+  if (ss.get('iconec-from') && y) { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; window.scrollTo(0, y); }
+  if (!back(null) && !rm) {
+    tiles.forEach(function (t, i) {
+      t.animate([{ opacity: 0, transform: 'translateY(16px)' }, { opacity: 1, transform: 'none' }], { duration: 700, delay: i * 40, easing: EO, fill: 'backwards' });
+    });
+  }
+  window.addEventListener('pageshow', function (e) {
+    if (!e.persisted) return;
+    busy = false;
+    back(document.querySelector('.xp'));
+  });
+})();
+</script>
+
+</body>
+</html>
